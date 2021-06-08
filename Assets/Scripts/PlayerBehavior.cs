@@ -1,18 +1,17 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
-public class PlayerBehavior : MonoBehaviour
-{
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
+public class PlayerBehavior : MonoBehaviour {
 
-    // Update is called once per frame
-    void Update()
-    {
-        
+    private Rigidbody _rigidbody;
+
+    private const float Speed = 1.0f;
+
+    private void Start() {
+        _rigidbody = GetComponent<Rigidbody>();
+    }
+    
+    private void FixedUpdate() {
+        _rigidbody.MovePosition(_rigidbody.position + new Vector3(-Input.GetAxisRaw("Vertical") * Speed * Time.deltaTime, 0.0f,
+            Input.GetAxisRaw("Horizontal") * Speed * Time.deltaTime));
     }
 }
