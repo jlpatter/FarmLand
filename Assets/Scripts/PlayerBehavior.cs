@@ -3,21 +3,34 @@ using UnityEngine;
 public class PlayerBehavior : MonoBehaviour {
 
     public Transform cameraTransform;
+    public Transform groundCheckTransform;
+    public LayerMask groundMask;
     
     private CharacterController _characterController;
     private float _turnSmoothVelocity;
+    private Vector3 _velocity;
+    private bool _isGrounded;
 
     private const float Speed = 6.0f;
     private const float TurnSmoothTime = 0.1f;
+    private const float Gravity = -9.81f;
+    private const float GroundDistance = 0.4f;
 
     private void Start() {
         _characterController = GetComponent<CharacterController>();
     }
 
     private void Update() {
+
+        _isGrounded = Physics.CheckSphere(groundCheckTransform.position, GroundDistance, groundMask);
+
+        if (_isGrounded && _velocity.y < 0) {
+            _velocity.y = -2.0f;
+        }
+        
         var horizontal = Input.GetAxisRaw("Horizontal");
         var vertical = Input.GetAxisRaw("Vertical");
-        Vector3 direction = new Vector3(horizontal, 0.0f, vertical).normalized;
+        var direction = new Vector3(horizontal, 0.0f, vertical).normalized;
 
         if (direction.magnitude >= 0.1f) {
 
@@ -28,5 +41,8 @@ public class PlayerBehavior : MonoBehaviour {
             var moveDirection = Quaternion.Euler(0.0f, targetAngle, 0.0f) * Vector3.forward;
             _characterController.Move(moveDirection.normalized * (Speed * Time.deltaTime));
         }
+
+        _velocity.y += Gravity * Time.deltaTime;
+        _characterController.Move(_velocity * Time.deltaTime);
     }
 }
