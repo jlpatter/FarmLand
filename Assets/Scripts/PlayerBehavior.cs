@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 public class PlayerBehavior : MonoBehaviour {
@@ -11,6 +12,8 @@ public class PlayerBehavior : MonoBehaviour {
     private float _turnSmoothVelocity;
     private Vector3 _velocity;
     private bool _isGrounded;
+    private bool _hasPickUpAble;
+    private GameObject _currentPickUpAble;
 
     private const float Speed = 6.0f;
     private const float TurnSmoothTime = 0.1f;
@@ -19,11 +22,14 @@ public class PlayerBehavior : MonoBehaviour {
 
     private void Start() {
         _characterController = GetComponent<CharacterController>();
+        _hasPickUpAble = false;
+        _currentPickUpAble = null;
     }
 
     private void Update() {
         MovePlayer();
         SwingWeapon();
+        PickUpStuff();
     }
 
     private void MovePlayer() {
@@ -54,6 +60,30 @@ public class PlayerBehavior : MonoBehaviour {
     private void SwingWeapon() {
         if (Input.GetKeyDown(KeyCode.Space)) {
             weapon.SetActive(true);
+        }
+    }
+
+    private void PickUpStuff() {
+        if (Input.GetKeyDown(KeyCode.E)) {
+            if (!_hasPickUpAble) {
+                var allPickUpAbles = GameObject.FindGameObjectsWithTag("PickUpAble");
+                var currentMagnitude = float.PositiveInfinity;
+                foreach (var pickUpAble in allPickUpAbles) {
+                    var tempMagnitude = (pickUpAble.transform.position - transform.position).magnitude;
+                    if (tempMagnitude < currentMagnitude && tempMagnitude < 2.0f) {
+                        _currentPickUpAble = pickUpAble;
+                        _hasPickUpAble = true;
+                        currentMagnitude = tempMagnitude;
+                    }
+                }
+                if (_hasPickUpAble) {
+                    _currentPickUpAble.transform.position = transform.position;
+                    _currentPickUpAble.transform.position += new Vector3(0.0f, _currentPickUpAble.transform.localScale.y, 0.0f);
+                    _currentPickUpAble.transform.parent = transform;
+                    Destroy(_currentPickUpAble.GetComponent<Rigidbody>());
+                    Destroy(_currentPickUpAble.GetComponent<BoxCollider>());
+                }
+            }
         }
     }
 }
