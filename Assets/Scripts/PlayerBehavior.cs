@@ -2,6 +2,7 @@ using UnityEngine;
 
 public class PlayerBehavior : MonoBehaviour {
 
+    public GameObject weapon;
     public Transform cameraTransform;
     public Transform groundCheckTransform;
     public LayerMask groundMask;
@@ -21,7 +22,11 @@ public class PlayerBehavior : MonoBehaviour {
     }
 
     private void Update() {
+        MovePlayer();
+        SwingWeapon();
+    }
 
+    private void MovePlayer() {
         _isGrounded = Physics.CheckSphere(groundCheckTransform.position, GroundDistance, groundMask);
 
         if (_isGrounded && _velocity.y < 0) {
@@ -44,5 +49,11 @@ public class PlayerBehavior : MonoBehaviour {
 
         _velocity.y += Gravity * Time.deltaTime;
         _characterController.Move(_velocity * Time.deltaTime);
+    }
+
+    private void SwingWeapon() {
+        if (Input.GetKeyDown(KeyCode.Space)) {
+            weapon.SetActive(true);
+        }
     }
 }

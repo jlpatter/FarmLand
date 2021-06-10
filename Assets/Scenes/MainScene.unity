@@ -133,13 +133,14 @@ GameObject:
   m_Component:
   - component: {fileID: 49710596}
   - component: {fileID: 49710597}
+  - component: {fileID: 49710598}
   m_Layer: 0
   m_Name: Weapon
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &49710596
 Transform:
   m_ObjectHideFlags: 0
@@ -174,6 +175,18 @@ Animator:
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorControllerStateOnDisable: 0
+--- !u!114 &49710598
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 49710595}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 059236d9e33b69c40846c85066500fb7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &55058931
 GameObject:
   m_ObjectHideFlags: 3
@@ -1283,6 +1296,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7a893fa1a8b33b14dbd3377d0ffc15a5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  weapon: {fileID: 49710595}
   cameraTransform: {fileID: 1497913500}
   groundCheckTransform: {fileID: 1739435389}
   groundMask:
