@@ -1,7 +1,7 @@
 using UnityEngine;
 using Random = UnityEngine.Random;
 
-public class EnemyBehavior : MonoBehaviour {
+public class AIBehavior : MonoBehaviour {
     public Transform groundCheckTransform;
     public LayerMask groundMask;
     

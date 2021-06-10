@@ -13,6 +13,7 @@ public class PlayerBehavior : MonoBehaviour {
     private bool _isGrounded;
     private bool _hasPickUpAble;
     private GameObject _currentPickUpAble;
+    private Animal _currentAnimal;
 
     private const float Speed = 6.0f;
     private const float TurnSmoothTime = 0.1f;
@@ -23,6 +24,7 @@ public class PlayerBehavior : MonoBehaviour {
         _characterController = GetComponent<CharacterController>();
         _hasPickUpAble = false;
         _currentPickUpAble = null;
+        _currentAnimal = Animal.Rabbit;
     }
 
     private void Update() {
@@ -35,7 +37,7 @@ public class PlayerBehavior : MonoBehaviour {
         if (other.name.Contains("Goal") && _hasPickUpAble) {
             Destroy(_currentPickUpAble);
             _hasPickUpAble = false;
-            GameObject.Find("Scoreboard").GetComponent<ScoreboardBehavior>().AddPoint(Animal.Rabbit);
+            GameObject.Find("Scoreboard").GetComponent<ScoreboardBehavior>().AddPoint(_currentAnimal);
         }
     }
 
