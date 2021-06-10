@@ -34,6 +34,7 @@ public class PlayerBehavior : MonoBehaviour {
     private void OnTriggerEnter(Collider other) {
         if (other.name.Contains("Goal") && _hasPickUpAble) {
             Destroy(_currentPickUpAble);
+            _hasPickUpAble = false;
             GameObject.Find("Scoreboard").GetComponent<ScoreboardBehavior>().AddPoint(Animal.Rabbit);
         }
     }
