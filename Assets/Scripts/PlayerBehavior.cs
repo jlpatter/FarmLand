@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using UnityEngine;
 
 public class PlayerBehavior : MonoBehaviour {
@@ -30,6 +29,13 @@ public class PlayerBehavior : MonoBehaviour {
         MovePlayer();
         SwingWeapon();
         PickUpStuff();
+    }
+
+    private void OnTriggerEnter(Collider other) {
+        if (other.name.Contains("Goal") && _hasPickUpAble) {
+            Destroy(_currentPickUpAble);
+            // TODO: Insert a method to add points to a team
+        }
     }
 
     private void MovePlayer() {
