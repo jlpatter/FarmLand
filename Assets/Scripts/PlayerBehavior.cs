@@ -13,7 +13,6 @@ public class PlayerBehavior : MonoBehaviour {
     private bool _isGrounded;
     private bool _hasPickUpAble;
     private GameObject _currentPickUpAble;
-    private Animal _currentAnimal;
 
     private const float Speed = 6.0f;
     private const float TurnSmoothTime = 0.1f;
@@ -24,21 +23,12 @@ public class PlayerBehavior : MonoBehaviour {
         _characterController = GetComponent<CharacterController>();
         _hasPickUpAble = false;
         _currentPickUpAble = null;
-        _currentAnimal = Animal.Rabbit;
     }
 
     private void Update() {
         MovePlayer();
         SwingWeapon();
         PickUpStuff();
-    }
-
-    private void OnTriggerEnter(Collider other) {
-        if (other.name.Contains("Goal") && _hasPickUpAble) {
-            Destroy(_currentPickUpAble);
-            _hasPickUpAble = false;
-            GameObject.Find("Scoreboard").GetComponent<ScoreboardBehavior>().AddPoint(_currentAnimal);
-        }
     }
 
     private void MovePlayer() {
@@ -86,12 +76,21 @@ public class PlayerBehavior : MonoBehaviour {
                     }
                 }
                 if (_hasPickUpAble) {
-                    _currentPickUpAble.transform.position = transform.position;
-                    _currentPickUpAble.transform.position += new Vector3(0.0f, _currentPickUpAble.transform.localScale.y, 0.0f);
+                    _currentPickUpAble.transform.position = transform.position + new Vector3(0.0f, _currentPickUpAble.transform.localScale.y, 0.0f);
                     _currentPickUpAble.transform.parent = transform;
-                    Destroy(_currentPickUpAble.GetComponent<Rigidbody>());
-                    Destroy(_currentPickUpAble.GetComponent<BoxCollider>());
+                    var tempCurrentPickUpAbleRb = _currentPickUpAble.GetComponent<Rigidbody>();
+                    tempCurrentPickUpAbleRb.useGravity = false;
+                    tempCurrentPickUpAbleRb.isKinematic = true;
                 }
+            }
+            else {
+                var tempCurrentPickUpAbleRb = _currentPickUpAble.GetComponent<Rigidbody>();
+                tempCurrentPickUpAbleRb.useGravity = true;
+                tempCurrentPickUpAbleRb.isKinematic = false;
+                _currentPickUpAble.transform.localPosition += new Vector3(0.0f, 0.0f, _currentPickUpAble.transform.localScale.z);
+                _currentPickUpAble.transform.parent = null;
+                _currentPickUpAble = null;
+                _hasPickUpAble = false;
             }
         }
     }
