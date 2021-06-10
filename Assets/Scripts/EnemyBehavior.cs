@@ -1,4 +1,5 @@
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 public class EnemyBehavior : MonoBehaviour {
     public Transform groundCheckTransform;
@@ -42,6 +43,12 @@ public class EnemyBehavior : MonoBehaviour {
 
         _velocity.y += Gravity * Time.deltaTime;
         _characterController.Move(_velocity * Time.deltaTime);
+    }
+
+    private void OnTriggerEnter(Collider other) {
+        if (other.name.Equals("Weapon")) {
+            Destroy(gameObject);
+        }
     }
 
     private void PickRandomDirection() {
