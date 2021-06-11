@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
@@ -81,6 +82,8 @@ public class AIBehavior : MonoBehaviour {
                 FollowBarnInterior();
                 PickUpAndDropStuff();
                 break;
+            default:
+                throw new ArgumentOutOfRangeException();
         }
         if (_currentDirection.magnitude >= 0.1f) {
 
