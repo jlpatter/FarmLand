@@ -11,6 +11,8 @@ public class AIBehavior : MonoBehaviour {
     private bool _isGrounded;
     private float _timer;
     private Vector3 _currentDirection;
+    private bool _isGrazing;
+    private GameObject _gameObjectToFollow;
 
     private const float Speed = 2.0f;
     private const float TurnSmoothTime = 0.1f;
@@ -20,6 +22,8 @@ public class AIBehavior : MonoBehaviour {
     private void Start() {
         _characterController = GetComponent<CharacterController>();
         _timer = -1.0f;
+        _isGrazing = false;
+        _gameObjectToFollow = null;
     }
 
     private void Update() {
@@ -30,7 +34,17 @@ public class AIBehavior : MonoBehaviour {
             _velocity.y = -2.0f;
         }
 
-        PickRandomDirection();
+        if (_isGrazing) {
+            PickRandomDirection();
+        }
+        else {
+            if (_gameObjectToFollow == null) {
+                FindPickUpAble();
+            }
+            else {
+                FollowPickUpAble();
+            }
+        }
         if (_currentDirection.magnitude >= 0.1f) {
 
             var targetAngle = Mathf.Atan2(_currentDirection.x, _currentDirection.z) * Mathf.Rad2Deg;
@@ -51,10 +65,31 @@ public class AIBehavior : MonoBehaviour {
         }
     }
 
+    private void FindPickUpAble() {
+        var pickUpAbles = GameObject.FindGameObjectsWithTag("PickUpAble");
+        foreach (var pickUpAble in pickUpAbles) {
+            var pickUpAbleBehavior = pickUpAble.GetComponent<PickUpAbleBehavior>();
+            if (!pickUpAbleBehavior.HasFollower) {
+                _currentDirection = (pickUpAble.transform.position - transform.position).normalized;
+                _gameObjectToFollow = pickUpAble;
+                pickUpAbleBehavior.HasFollower = true;
+                break;
+            }
+        }
+
+        if (_gameObjectToFollow == null) {
+            _isGrazing = true;
+        }
+    }
+
+    private void FollowPickUpAble() {
+        _currentDirection = (_gameObjectToFollow.transform.position - transform.position).normalized;
+    }
+
     private void PickRandomDirection() {
         _timer -= Time.deltaTime;
         if (_timer < 0.0f) {
-            _currentDirection = new Vector3(Random.Range(-1, 2), 0.0f, Random.Range(-1, 2));
+            _currentDirection = new Vector3(Random.Range(-1, 2), 0.0f, Random.Range(-1, 2)).normalized;
             _timer = Random.Range(1.0f, 3.0f);
         }
     }

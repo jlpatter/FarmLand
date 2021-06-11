@@ -2,6 +2,8 @@ using System;
 using UnityEngine;
 
 public class PickUpAbleBehavior : MonoBehaviour {
+    
+    public bool HasFollower { get; set; }
 
     private ScoreboardBehavior _scoreboardBehavior;
 
