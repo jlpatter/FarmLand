@@ -2,7 +2,7 @@ using UnityEngine;
 
 public class PlayerBehavior : MonoBehaviour {
 
-    public Animal Animal { get; set; }
+    public Animal Animal { get; private set; }
     
     public GameObject weapon;
     public Transform cameraTransform;
@@ -81,6 +81,7 @@ public class PlayerBehavior : MonoBehaviour {
                 if (_hasPickUpAble) {
                     _currentPickUpAble.transform.position = transform.position + new Vector3(0.0f, _currentPickUpAble.transform.localScale.y, 0.0f);
                     _currentPickUpAble.transform.parent = transform;
+                    _currentPickUpAble.GetComponent<PickUpAbleBehavior>().HasFollowerDictionary[Animal] = false;
                     var tempCurrentPickUpAbleRb = _currentPickUpAble.GetComponent<Rigidbody>();
                     tempCurrentPickUpAbleRb.useGravity = false;
                     tempCurrentPickUpAbleRb.isKinematic = true;

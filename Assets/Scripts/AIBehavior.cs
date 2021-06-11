@@ -117,10 +117,10 @@ public class AIBehavior : MonoBehaviour {
         var pickUpAbles = GameObject.FindGameObjectsWithTag("PickUpAble");
         foreach (var pickUpAble in pickUpAbles) {
             var pickUpAbleBehavior = pickUpAble.GetComponent<PickUpAbleBehavior>();
-            if (!pickUpAbleBehavior.HasFollower) {
+            if (!pickUpAbleBehavior.HasFollowerDictionary[_animal]) {
                 _targetPickUpAble = pickUpAble;
                 _currentState = AIState.IsTravelingToPickUpAble;
-                pickUpAbleBehavior.HasFollower = true;
+                pickUpAbleBehavior.HasFollowerDictionary[_animal] = true;
                 break;
             }
         }
@@ -182,7 +182,7 @@ public class AIBehavior : MonoBehaviour {
                 tempCurrentPickUpAbleRb.isKinematic = false;
                 _targetPickUpAble.transform.localPosition += new Vector3(0.0f, 0.0f, _targetPickUpAble.transform.localScale.z);
                 _targetPickUpAble.transform.parent = null;
-                _targetPickUpAble.GetComponent<PickUpAbleBehavior>().HasFollower = false;
+                _targetPickUpAble.GetComponent<PickUpAbleBehavior>().HasFollowerDictionary[_animal] = false;
                 _targetPickUpAble = null;
                 _hasPickUpAble = false;
             }

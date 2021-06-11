@@ -1,13 +1,18 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 public class PickUpAbleBehavior : MonoBehaviour {
     
-    public bool HasFollower { get; set; }
+    public Dictionary<Animal, bool> HasFollowerDictionary { get; private set; }
 
     private ScoreboardBehavior _scoreboardBehavior;
 
     private void Start() {
+        HasFollowerDictionary = new Dictionary<Animal, bool>();
+        foreach (Animal animal in Enum.GetValues(typeof(Animal))) {
+            HasFollowerDictionary[animal] = false;
+        }
         _scoreboardBehavior = GameObject.Find("Scoreboard").GetComponent<ScoreboardBehavior>();
     }
     private void OnTriggerEnter(Collider other) {
