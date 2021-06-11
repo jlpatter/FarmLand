@@ -20,7 +20,8 @@ public class AIBehavior : MonoBehaviour {
     private GameObject _barnInterior;
     private bool _hasPickUpAble;
 
-    private const float Speed = 2.0f;
+    protected float speed = 5.0f;
+    
     private const float TurnSmoothTime = 0.1f;
     private const float Gravity = -9.81f;
     private const float GroundDistance = 0.4f;
@@ -34,7 +35,7 @@ public class AIBehavior : MonoBehaviour {
         IsTravelingToBarnInterior
     }
 
-    private void Start() {
+    protected void Start() {
         _characterController = GetComponent<CharacterController>();
         _timer = -1.0f;
         _targetPickUpAble = null;
@@ -99,7 +100,7 @@ public class AIBehavior : MonoBehaviour {
             transform.rotation = Quaternion.Euler(0.0f, angle, 0.0f);
 
             var moveDirection = Quaternion.Euler(0.0f, targetAngle, 0.0f) * Vector3.forward;
-            _characterController.Move(moveDirection.normalized * (Speed * Time.deltaTime));
+            _characterController.Move(moveDirection.normalized * (speed * Time.deltaTime));
         }
 
         _velocity.y += Gravity * Time.deltaTime;
