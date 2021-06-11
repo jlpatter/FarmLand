@@ -28,7 +28,7 @@ public class PlayerBehavior : MonoBehaviour {
     private void Update() {
         MovePlayer();
         SwingWeapon();
-        PickUpStuff();
+        PickUpAndDropStuff();
     }
 
     private void MovePlayer() {
@@ -62,7 +62,7 @@ public class PlayerBehavior : MonoBehaviour {
         }
     }
 
-    private void PickUpStuff() {
+    private void PickUpAndDropStuff() {
         if (Input.GetKeyDown(KeyCode.E)) {
             if (!_hasPickUpAble) {
                 var allPickUpAbles = GameObject.FindGameObjectsWithTag("PickUpAble");

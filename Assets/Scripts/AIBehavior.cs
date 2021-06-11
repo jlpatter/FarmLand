@@ -4,7 +4,8 @@ using Random = UnityEngine.Random;
 public class AIBehavior : MonoBehaviour {
     public Transform groundCheckTransform;
     public LayerMask groundMask;
-    
+
+    private Animal _animal;
     private CharacterController _characterController;
     private float _turnSmoothVelocity;
     private Vector3 _velocity;
@@ -12,7 +13,13 @@ public class AIBehavior : MonoBehaviour {
     private float _timer;
     private Vector3 _currentDirection;
     private bool _isGrazing;
-    private GameObject _gameObjectToFollow;
+    private GameObject _targetPickUpAble;
+    private GameObject _barnEntrance;
+    private GameObject _barnInterior;
+    private bool _hasPickUpAble;
+    private bool _goingToBarn;
+    private bool _followBarnInterior;
+    private bool _isInBarn;
 
     private const float Speed = 2.0f;
     private const float TurnSmoothTime = 0.1f;
@@ -23,7 +30,27 @@ public class AIBehavior : MonoBehaviour {
         _characterController = GetComponent<CharacterController>();
         _timer = -1.0f;
         _isGrazing = false;
-        _gameObjectToFollow = null;
+        _targetPickUpAble = null;
+        _hasPickUpAble = false;
+        _goingToBarn = false;
+        _followBarnInterior = false;
+        _isInBarn = false;
+        
+        if (name.Contains("Rabbit")) {
+            _animal = Animal.Rabbit;
+        }
+        else if (name.Contains("Cow")) {
+            _animal = Animal.Cow;
+        }
+        else if (name.Contains("Pig")) {
+            _animal = Animal.Pig;
+        }
+        else if (name.Contains("Chicken")) {
+            _animal = Animal.Chicken;
+        }
+
+        _barnInterior = GameObject.Find(_animal + "Barn").transform.Find("Middle").gameObject;
+        _barnEntrance = GameObject.Find(_animal + "Barn").transform.Find("Entrance").gameObject;
     }
 
     private void Update() {
@@ -38,11 +65,22 @@ public class AIBehavior : MonoBehaviour {
             PickRandomDirection();
         }
         else {
-            if (_gameObjectToFollow == null) {
+            if (_targetPickUpAble == null) {
                 FindPickUpAble();
             }
             else {
-                FollowPickUpAble();
+                if (!_goingToBarn) {
+                    FollowPickUpAble();
+                }
+                else {
+                    if (_followBarnInterior) {
+                        FollowBarnInterior();
+                    }
+                    else {
+                        FollowBarn();
+                    }
+                }
+                PickUpAndDropStuff();
             }
         }
         if (_currentDirection.magnitude >= 0.1f) {
@@ -71,19 +109,60 @@ public class AIBehavior : MonoBehaviour {
             var pickUpAbleBehavior = pickUpAble.GetComponent<PickUpAbleBehavior>();
             if (!pickUpAbleBehavior.HasFollower) {
                 _currentDirection = (pickUpAble.transform.position - transform.position).normalized;
-                _gameObjectToFollow = pickUpAble;
+                _targetPickUpAble = pickUpAble;
                 pickUpAbleBehavior.HasFollower = true;
                 break;
             }
         }
 
-        if (_gameObjectToFollow == null) {
+        if (_targetPickUpAble == null) {
             _isGrazing = true;
         }
     }
 
     private void FollowPickUpAble() {
-        _currentDirection = (_gameObjectToFollow.transform.position - transform.position).normalized;
+        _currentDirection = (_targetPickUpAble.transform.position - transform.position).normalized;
+    }
+
+    private void FollowBarn() {
+        _currentDirection = (_barnEntrance.transform.position - transform.position).normalized;
+        if ((_barnEntrance.transform.position - transform.position).magnitude < 2.0f) {
+            _followBarnInterior = true;
+        }
+    }
+
+    private void FollowBarnInterior() {
+        _currentDirection = (_barnInterior.transform.position - transform.position).normalized;
+        if ((_barnInterior.transform.position - transform.position).magnitude < 2.0f) {
+            _isInBarn = true;
+            _isGrazing = true;
+        }
+    }
+    
+    private void PickUpAndDropStuff() {
+        if (!_hasPickUpAble) {
+            var tempMagnitude = (_targetPickUpAble.transform.position - transform.position).magnitude;
+            if (tempMagnitude < 2.0f) {
+                _targetPickUpAble.transform.position = transform.position + new Vector3(0.0f, _targetPickUpAble.transform.localScale.y, 0.0f);
+                _targetPickUpAble.transform.parent = transform;
+                var tempCurrentPickUpAbleRb = _targetPickUpAble.GetComponent<Rigidbody>();
+                tempCurrentPickUpAbleRb.useGravity = false;
+                tempCurrentPickUpAbleRb.isKinematic = true;
+                _hasPickUpAble = true;
+                _goingToBarn = true;
+            }
+        }
+        else {
+            if (_isInBarn) {
+                var tempCurrentPickUpAbleRb = _targetPickUpAble.GetComponent<Rigidbody>();
+                tempCurrentPickUpAbleRb.useGravity = true;
+                tempCurrentPickUpAbleRb.isKinematic = false;
+                _targetPickUpAble.transform.localPosition += new Vector3(0.0f, 0.0f, _targetPickUpAble.transform.localScale.z);
+                _targetPickUpAble.transform.parent = null;
+                _targetPickUpAble = null;
+                _hasPickUpAble = false;
+            }
+        }
     }
 
     private void PickRandomDirection() {
