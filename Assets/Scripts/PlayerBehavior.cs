@@ -2,6 +2,8 @@ using UnityEngine;
 
 public class PlayerBehavior : MonoBehaviour {
 
+    public Animal Animal { get; set; }
+    
     public GameObject weapon;
     public Transform cameraTransform;
     public Transform groundCheckTransform;
@@ -23,6 +25,7 @@ public class PlayerBehavior : MonoBehaviour {
         _characterController = GetComponent<CharacterController>();
         _hasPickUpAble = false;
         _currentPickUpAble = null;
+        Animal = Animal.Rabbit;
     }
 
     private void Update() {

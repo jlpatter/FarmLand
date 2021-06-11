@@ -14,6 +14,7 @@ public class AIBehavior : MonoBehaviour {
     private bool _isGrounded;
     private float _timer;
     private Vector3 _currentDirection;
+    private GameObject _playerGameObject;
     private GameObject _targetPickUpAble;
     private GameObject _barnEntrance;
     private GameObject _barnInterior;
@@ -27,6 +28,7 @@ public class AIBehavior : MonoBehaviour {
     private enum AIState {
         IsGrazing,
         FindingPickUpAble,
+        FollowPlayer,
         IsTravelingToPickUpAble,
         IsTravelingToBarnEntrance,
         IsTravelingToBarnInterior
@@ -38,6 +40,7 @@ public class AIBehavior : MonoBehaviour {
         _targetPickUpAble = null;
         _hasPickUpAble = false;
         _currentState = AIState.FindingPickUpAble;
+        _playerGameObject = GameObject.Find("Player");
 
         if (name.Contains("Rabbit")) {
             _animal = Animal.Rabbit;
@@ -67,9 +70,13 @@ public class AIBehavior : MonoBehaviour {
         switch (_currentState) {
             case AIState.IsGrazing:
                 PickRandomDirection();
+                FindPlayer();
                 break;
             case AIState.FindingPickUpAble:
                 FindPickUpAble();
+                break;
+            case AIState.FollowPlayer:
+                FollowPlayer();
                 break;
             case AIState.IsTravelingToPickUpAble:
                 FollowPickUpAble();
@@ -122,6 +129,19 @@ public class AIBehavior : MonoBehaviour {
         }
     }
 
+    private void FindPlayer() {
+        if ((_playerGameObject.transform.position - transform.position).magnitude < 10.0f && _playerGameObject.GetComponent<PlayerBehavior>().Animal != _animal) {
+            _currentState = AIState.FollowPlayer;
+        }
+    }
+
+    private void FollowPlayer() {
+        _currentDirection = (_playerGameObject.transform.position - transform.position).normalized;
+        if ((_playerGameObject.transform.position - transform.position).magnitude > 10.0f) {
+            _currentState = AIState.IsGrazing;
+        }
+    }
+
     private void FollowPickUpAble() {
         _currentDirection = (_targetPickUpAble.transform.position - transform.position).normalized;
     }
@@ -161,6 +181,7 @@ public class AIBehavior : MonoBehaviour {
                 tempCurrentPickUpAbleRb.isKinematic = false;
                 _targetPickUpAble.transform.localPosition += new Vector3(0.0f, 0.0f, _targetPickUpAble.transform.localScale.z);
                 _targetPickUpAble.transform.parent = null;
+                _targetPickUpAble.GetComponent<PickUpAbleBehavior>().HasFollower = false;
                 _targetPickUpAble = null;
                 _hasPickUpAble = false;
             }
