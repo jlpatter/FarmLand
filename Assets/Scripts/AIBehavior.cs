@@ -1,13 +1,15 @@
 using System;
+using System.Linq;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
 public class AIBehavior : MonoBehaviour {
+    public Animal Animal { get; private set; }
+    public GameManagerBehavior GameManagerBehavior { get; private set; }
+    
     public Transform groundCheckTransform;
     public LayerMask groundMask;
-
-    private GameManagerBehavior _gameManagerBehavior;
-    private Animal _animal;
+    
     private AIState _currentState;
     private CharacterController _characterController;
     private float _turnSmoothVelocity;
@@ -46,23 +48,23 @@ public class AIBehavior : MonoBehaviour {
         _currentEnemy = null;
 
         if (name.Contains("Rabbit")) {
-            _animal = Animal.Rabbit;
+            Animal = Animal.Rabbit;
         }
         else if (name.Contains("Cow")) {
-            _animal = Animal.Cow;
+            Animal = Animal.Cow;
         }
         else if (name.Contains("Pig")) {
-            _animal = Animal.Pig;
+            Animal = Animal.Pig;
         }
         else if (name.Contains("Chicken")) {
-            _animal = Animal.Chicken;
+            Animal = Animal.Chicken;
         }
 
-        _gameManagerBehavior = GameObject.Find("GameManager").GetComponent<GameManagerBehavior>();
-        _gameManagerBehavior.AllAnimals.Add(new Tuple<GameObject, Animal>(gameObject, _animal));
+        GameManagerBehavior = GameObject.Find("GameManager").GetComponent<GameManagerBehavior>();
+        GameManagerBehavior.AllAnimals.Add(new Tuple<GameObject, Animal>(gameObject, Animal));
         
-        _barnInterior = GameObject.Find(_animal + "Barn").transform.Find("Middle").gameObject;
-        _barnEntrance = GameObject.Find(_animal + "Barn").transform.Find("Entrance").gameObject;
+        _barnInterior = GameObject.Find(Animal + "Barn").transform.Find("Middle").gameObject;
+        _barnEntrance = GameObject.Find(Animal + "Barn").transform.Find("Entrance").gameObject;
     }
 
     private void Update() {
@@ -112,9 +114,14 @@ public class AIBehavior : MonoBehaviour {
         _characterController.Move(_velocity * Time.deltaTime);
     }
 
-    private void OnTriggerEnter(Collider other) {
+    protected void OnTriggerEnter(Collider other) {
         if (other.name.Equals("Weapon")) {
+            // TODO: Make it take damage instead of destroying it!
             Destroy(gameObject);
+            var toRemove = GameManagerBehavior.AllAnimals.Where(tuple => gameObject == tuple.Item1).ToList();
+            foreach (var removeMe in toRemove) {
+                GameManagerBehavior.AllAnimals.Remove(removeMe);
+            }
         }
     }
 
@@ -122,10 +129,10 @@ public class AIBehavior : MonoBehaviour {
         var pickUpAbles = GameObject.FindGameObjectsWithTag("PickUpAble");
         foreach (var pickUpAble in pickUpAbles) {
             var pickUpAbleBehavior = pickUpAble.GetComponent<PickUpAbleBehavior>();
-            if (!pickUpAbleBehavior.HasFollowerDictionary[_animal]) {
+            if (!pickUpAbleBehavior.HasFollowerDictionary[Animal]) {
                 _targetPickUpAble = pickUpAble;
                 _currentState = AIState.IsTravelingToPickUpAble;
-                pickUpAbleBehavior.HasFollowerDictionary[_animal] = true;
+                pickUpAbleBehavior.HasFollowerDictionary[Animal] = true;
                 break;
             }
         }
@@ -136,8 +143,8 @@ public class AIBehavior : MonoBehaviour {
     }
 
     private void FindEnemy() {
-        foreach (var (animalGameObject, animal) in _gameManagerBehavior.AllAnimals) {
-            if ((animalGameObject.transform.position - transform.position).magnitude < EnemySensoryRange && animal != _animal) {
+        foreach (var (animalGameObject, animal) in GameManagerBehavior.AllAnimals) {
+            if ((animalGameObject.transform.position - transform.position).magnitude < EnemySensoryRange && animal != Animal) {
                 _currentState = AIState.FollowEnemy;
                 _currentEnemy = animalGameObject;
             }
@@ -190,7 +197,7 @@ public class AIBehavior : MonoBehaviour {
                 tempCurrentPickUpAbleRb.isKinematic = false;
                 _targetPickUpAble.transform.localPosition += new Vector3(0.0f, 0.0f, _targetPickUpAble.transform.localScale.z);
                 _targetPickUpAble.transform.parent = null;
-                _targetPickUpAble.GetComponent<PickUpAbleBehavior>().HasFollowerDictionary[_animal] = false;
+                _targetPickUpAble.GetComponent<PickUpAbleBehavior>().HasFollowerDictionary[Animal] = false;
                 _targetPickUpAble = null;
                 _hasPickUpAble = false;
             }
