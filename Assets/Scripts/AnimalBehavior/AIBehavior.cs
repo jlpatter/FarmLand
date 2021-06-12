@@ -7,6 +7,7 @@ namespace AnimalBehavior {
     public class AIBehavior : MonoBehaviour {
         public AnimalTypes AnimalType { get; private set; }
         public GameManagerBehavior GameManagerBehavior { get; private set; }
+        public float Health { get; set; }
     
         public Transform groundCheckTransform;
         public LayerMask groundMask;
@@ -24,8 +25,7 @@ namespace AnimalBehavior {
         private GameObject _barnInterior;
         private bool _hasPickUpAble;
         private float _speed;
-        private float _health;
-    
+
         private const float TurnSmoothTime = 0.1f;
         private const float Gravity = -9.81f;
         private const float GroundDistance = 0.4f;
@@ -65,7 +65,7 @@ namespace AnimalBehavior {
             GameManagerBehavior = GameObject.Find("GameManager").GetComponent<GameManagerBehavior>();
             GameManagerBehavior.AllAnimals.Add(new Tuple<GameObject, AnimalTypes>(gameObject, AnimalType));
             _speed = GameManagerBehavior.AnimalAttributesDict[AnimalType].Speed;
-            _health = GameManagerBehavior.AnimalAttributesDict[AnimalType].Health;
+            Health = GameManagerBehavior.AnimalAttributesDict[AnimalType].Health;
         
             _barnInterior = GameObject.Find(AnimalType + "Barn").transform.Find("Middle").gameObject;
             _barnEntrance = GameObject.Find(AnimalType + "Barn").transform.Find("Entrance").gameObject;
@@ -120,9 +120,9 @@ namespace AnimalBehavior {
 
         protected void OnTriggerEnter(Collider other) {
             if (other.name.Equals("Weapon")) {
-                _health -= WeaponDamage;
+                Health -= WeaponDamage;
 
-                if (_health <= 0.0f) {
+                if (Health <= 0.0f) {
                     var toRemoveList = GameManagerBehavior.AllAnimals.Where(tuple => gameObject == tuple.Item1).ToList();
                     foreach (var removeMe in toRemoveList) {
                         GameManagerBehavior.AllAnimals.Remove(removeMe);

@@ -5,6 +5,7 @@ public class PlayerBehavior : MonoBehaviour {
 
     public AnimalTypes AnimalType { get; private set; }
     public GameManagerBehavior GameManagerBehavior { get; private set; }
+    public float Health { get; set; }
     
     public GameObject weapon;
     public Transform cameraTransform;
@@ -31,6 +32,8 @@ public class PlayerBehavior : MonoBehaviour {
         
         GameManagerBehavior = GameObject.Find("GameManager").GetComponent<GameManagerBehavior>();
         GameManagerBehavior.AllAnimals.Add(new Tuple<GameObject, AnimalTypes>(gameObject, AnimalType));
+        Health = GameManagerBehavior.AnimalAttributesDict[AnimalType].Health;
+        GameObject.Find("HealthBar").GetComponent<PlayerHealthBar>().SetMaxHealth(Health);
     }
 
     private void Update() {
