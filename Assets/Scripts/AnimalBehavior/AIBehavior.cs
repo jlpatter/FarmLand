@@ -23,8 +23,8 @@ namespace AnimalBehavior {
         private GameObject _barnEntrance;
         private GameObject _barnInterior;
         private bool _hasPickUpAble;
-
-        protected float speed = 5.0f;
+        private float _speed;
+        private float _health;
     
         private const float TurnSmoothTime = 0.1f;
         private const float Gravity = -9.81f;
@@ -63,6 +63,8 @@ namespace AnimalBehavior {
 
             GameManagerBehavior = GameObject.Find("GameManager").GetComponent<GameManagerBehavior>();
             GameManagerBehavior.AllAnimals.Add(new Tuple<GameObject, Animal>(gameObject, Animal));
+            _speed = GameManagerBehavior.AnimalAttributesDict[Animal].Speed;
+            _health = GameManagerBehavior.AnimalAttributesDict[Animal].Health;
         
             _barnInterior = GameObject.Find(Animal + "Barn").transform.Find("Middle").gameObject;
             _barnEntrance = GameObject.Find(Animal + "Barn").transform.Find("Entrance").gameObject;
@@ -108,7 +110,7 @@ namespace AnimalBehavior {
                 transform.rotation = Quaternion.Euler(0.0f, angle, 0.0f);
 
                 var moveDirection = Quaternion.Euler(0.0f, targetAngle, 0.0f) * Vector3.forward;
-                _characterController.Move(moveDirection.normalized * (speed * Time.deltaTime));
+                _characterController.Move(moveDirection.normalized * (_speed * Time.deltaTime));
             }
 
             _velocity.y += Gravity * Time.deltaTime;

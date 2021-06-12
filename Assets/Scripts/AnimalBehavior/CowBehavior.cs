@@ -3,11 +3,6 @@ using UnityEngine;
 
 namespace AnimalBehavior {
     public class CowBehavior : AIBehavior {
-        private new void Start() {
-            speed = 2.0f;
-            base.Start();
-        }
-
         private new void OnTriggerEnter(Collider other) {
             var aiBehavior = other.gameObject.GetComponent<AIBehavior>();
             if (aiBehavior != null && aiBehavior.Animal != Animal) {
