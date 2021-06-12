@@ -6,6 +6,7 @@ public class AIBehavior : MonoBehaviour {
     public Transform groundCheckTransform;
     public LayerMask groundMask;
 
+    private GameManagerBehavior _gameManagerBehavior;
     private Animal _animal;
     private AIState _currentState;
     private CharacterController _characterController;
@@ -14,7 +15,7 @@ public class AIBehavior : MonoBehaviour {
     private bool _isGrounded;
     private float _timer;
     private Vector3 _currentDirection;
-    private GameObject _playerGameObject;
+    private GameObject _currentEnemy;
     private GameObject _targetPickUpAble;
     private GameObject _barnEntrance;
     private GameObject _barnInterior;
@@ -25,11 +26,12 @@ public class AIBehavior : MonoBehaviour {
     private const float TurnSmoothTime = 0.1f;
     private const float Gravity = -9.81f;
     private const float GroundDistance = 0.4f;
+    private const float EnemySensoryRange = 20.0f;
 
     private enum AIState {
         IsGrazing,
         FindingPickUpAble,
-        FollowPlayer,
+        FollowEnemy,
         IsTravelingToPickUpAble,
         IsTravelingToBarnEntrance,
         IsTravelingToBarnInterior
@@ -41,7 +43,7 @@ public class AIBehavior : MonoBehaviour {
         _targetPickUpAble = null;
         _hasPickUpAble = false;
         _currentState = AIState.FindingPickUpAble;
-        _playerGameObject = GameObject.Find("Player");
+        _currentEnemy = null;
 
         if (name.Contains("Rabbit")) {
             _animal = Animal.Rabbit;
@@ -56,6 +58,9 @@ public class AIBehavior : MonoBehaviour {
             _animal = Animal.Chicken;
         }
 
+        _gameManagerBehavior = GameObject.Find("GameManager").GetComponent<GameManagerBehavior>();
+        _gameManagerBehavior.AllAnimals.Add(new Tuple<GameObject, Animal>(gameObject, _animal));
+        
         _barnInterior = GameObject.Find(_animal + "Barn").transform.Find("Middle").gameObject;
         _barnEntrance = GameObject.Find(_animal + "Barn").transform.Find("Entrance").gameObject;
     }
@@ -71,13 +76,13 @@ public class AIBehavior : MonoBehaviour {
         switch (_currentState) {
             case AIState.IsGrazing:
                 PickRandomDirection();
-                FindPlayer();
+                FindEnemy();
                 break;
             case AIState.FindingPickUpAble:
                 FindPickUpAble();
                 break;
-            case AIState.FollowPlayer:
-                FollowPlayer();
+            case AIState.FollowEnemy:
+                FollowEnemy();
                 break;
             case AIState.IsTravelingToPickUpAble:
                 FollowPickUpAble();
@@ -130,15 +135,18 @@ public class AIBehavior : MonoBehaviour {
         }
     }
 
-    private void FindPlayer() {
-        if ((_playerGameObject.transform.position - transform.position).magnitude < 10.0f && _playerGameObject.GetComponent<PlayerBehavior>().Animal != _animal) {
-            _currentState = AIState.FollowPlayer;
+    private void FindEnemy() {
+        foreach (var (animalGameObject, animal) in _gameManagerBehavior.AllAnimals) {
+            if ((animalGameObject.transform.position - transform.position).magnitude < EnemySensoryRange && animal != _animal) {
+                _currentState = AIState.FollowEnemy;
+                _currentEnemy = animalGameObject;
+            }
         }
     }
 
-    private void FollowPlayer() {
-        _currentDirection = (_playerGameObject.transform.position - transform.position).normalized;
-        if ((_playerGameObject.transform.position - transform.position).magnitude > 10.0f) {
+    private void FollowEnemy() {
+        _currentDirection = (_currentEnemy.transform.position - transform.position).normalized;
+        if ((_currentEnemy.transform.position - transform.position).magnitude > EnemySensoryRange) {
             _currentState = AIState.IsGrazing;
         }
     }
