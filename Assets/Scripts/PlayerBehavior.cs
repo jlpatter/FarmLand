@@ -1,4 +1,5 @@
 using System;
+using StartMenu;
 using UnityEngine;
 
 public class PlayerBehavior : MonoBehaviour {
@@ -6,6 +7,11 @@ public class PlayerBehavior : MonoBehaviour {
     public AnimalTypes AnimalType { get; private set; }
     public GameManagerBehavior GameManagerBehavior { get; private set; }
     public float Health { get; set; }
+
+    public GameObject rabbitPrefab;
+    public GameObject cowPrefab;
+    public GameObject pigPrefab;
+    // TODO: Add chicken prefab.
     
     public GameObject weapon;
     public Transform cameraTransform;
@@ -28,8 +34,27 @@ public class PlayerBehavior : MonoBehaviour {
         _characterController = GetComponent<CharacterController>();
         _hasPickUpAble = false;
         _currentPickUpAble = null;
-        AnimalType = AnimalTypes.Rabbit;
-        
+        switch (StartMenuValue.animal) {
+            case 0:
+                AnimalType = AnimalTypes.Rabbit;
+                Instantiate(rabbitPrefab, transform.position, Quaternion.Euler(-90.0f, 0.0f, 90.0f), transform);
+                break;
+            case 1:
+                AnimalType = AnimalTypes.Cow;
+                Instantiate(cowPrefab, transform.position, Quaternion.Euler(-90.0f, 0.0f, 0.0f), transform);
+                break;
+            case 2:
+                AnimalType = AnimalTypes.Pig;
+                Instantiate(pigPrefab, transform.position, Quaternion.Euler(-90.0f, 0.0f, 0.0f), transform);
+                break;
+            case 3:
+                AnimalType = AnimalTypes.Chicken;
+                // TODO: Insert prefab here!
+                break;
+            default:
+                throw new ArgumentOutOfRangeException();
+        }
+
         GameManagerBehavior = GameObject.Find("GameManager").GetComponent<GameManagerBehavior>();
         GameManagerBehavior.AllAnimals.Add(new Tuple<GameObject, AnimalTypes>(gameObject, AnimalType));
         Health = GameManagerBehavior.AnimalAttributesDict[AnimalType].Health;
