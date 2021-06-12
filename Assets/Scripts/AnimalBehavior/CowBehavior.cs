@@ -10,6 +10,7 @@ namespace AnimalBehavior {
             var aiBehavior = other.gameObject.GetComponent<AIBehavior>();
             if (aiBehavior != null && aiBehavior.AnimalType != AnimalType) {
                 aiBehavior.Health -= TrampleStrength;
+                aiBehavior.HealthBar.SetHealth(aiBehavior.Health);
 
                 if (aiBehavior.Health <= 0.0f) {
                     var toRemoveList = aiBehavior.GameManagerBehavior.AllAnimals.Where(myTuple => myTuple.Item1 == other.gameObject).ToList();
