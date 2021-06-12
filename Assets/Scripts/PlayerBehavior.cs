@@ -7,6 +7,7 @@ public class PlayerBehavior : MonoBehaviour {
     public AnimalTypes AnimalType { get; private set; }
     public GameManagerBehavior GameManagerBehavior { get; private set; }
     public float Health { get; set; }
+    private float Speed { get; set; }
 
     public GameObject rabbitPrefab;
     public GameObject cowPrefab;
@@ -25,7 +26,6 @@ public class PlayerBehavior : MonoBehaviour {
     private bool _hasPickUpAble;
     private GameObject _currentPickUpAble;
 
-    private const float Speed = 6.0f;
     private const float TurnSmoothTime = 0.1f;
     private const float Gravity = -9.81f;
     private const float GroundDistance = 0.4f;
@@ -37,15 +37,26 @@ public class PlayerBehavior : MonoBehaviour {
         switch (StartMenuValue.animal) {
             case 0:
                 AnimalType = AnimalTypes.Rabbit;
+                transform.position = GameObject.Find(AnimalType + "Spawner").transform.position;
                 Instantiate(rabbitPrefab, transform.position, Quaternion.Euler(-90.0f, 0.0f, 90.0f), transform);
                 break;
             case 1:
                 AnimalType = AnimalTypes.Cow;
+                transform.position = GameObject.Find(AnimalType + "Spawner").transform.position;
                 Instantiate(cowPrefab, transform.position, Quaternion.Euler(-90.0f, 0.0f, 0.0f), transform);
+                groundCheckTransform.localPosition = new Vector3(groundCheckTransform.localPosition.x, -0.635f, groundCheckTransform.localPosition.z);
+                _characterController.center = new Vector3(_characterController.center.x, 0.3f, _characterController.center.z);
+                _characterController.radius = 0.98f;
+                _characterController.height = 1.49f;
                 break;
             case 2:
                 AnimalType = AnimalTypes.Pig;
+                transform.position = GameObject.Find(AnimalType + "Spawner").transform.position;
                 Instantiate(pigPrefab, transform.position, Quaternion.Euler(-90.0f, 0.0f, 0.0f), transform);
+                groundCheckTransform.localPosition = new Vector3(groundCheckTransform.localPosition.x, -0.359f, groundCheckTransform.localPosition.z);
+                _characterController.center = new Vector3(_characterController.center.x, 0.42f, _characterController.center.z);
+                _characterController.radius = 0.68f;
+                _characterController.height = 0.0f;
                 break;
             case 3:
                 AnimalType = AnimalTypes.Chicken;
@@ -59,6 +70,7 @@ public class PlayerBehavior : MonoBehaviour {
         GameManagerBehavior.AllAnimals.Add(new Tuple<GameObject, AnimalTypes>(gameObject, AnimalType));
         Health = GameManagerBehavior.AnimalAttributesDict[AnimalType].Health;
         GameObject.Find("HealthBar").GetComponent<PlayerHealthBar>().SetMaxHealth(Health);
+        Speed = GameManagerBehavior.AnimalAttributesDict[AnimalType].Speed;
     }
 
     private void Update() {
