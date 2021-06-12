@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 5257158225834574840}
   - component: {fileID: 5257158225834574843}
-  - component: {fileID: 5257158225834574842}
+  - component: {fileID: 611285042276977648}
   m_Layer: 0
   m_Name: Pig
   m_TagString: Untagged
@@ -52,7 +52,7 @@ CharacterController:
   m_SkinWidth: 0.08
   m_MinMoveDistance: 0.001
   m_Center: {x: 0, y: 0.18, z: 0}
---- !u!114 &5257158225834574842
+--- !u!114 &611285042276977648
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -61,7 +61,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 5257158225834574841}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c09fbf9b867bbdc429d24af6b4f8233b, type: 3}
+  m_Script: {fileID: 11500000, guid: aa94828296cf2c344b300df3b0995501, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   groundCheckTransform: {fileID: 5257158227717349361}
