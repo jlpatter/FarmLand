@@ -4,13 +4,13 @@ using UnityEngine;
 public class PlayerBehavior : MonoBehaviour {
 
     public Animal Animal { get; private set; }
+    public GameManagerBehavior GameManagerBehavior { get; private set; }
     
     public GameObject weapon;
     public Transform cameraTransform;
     public Transform groundCheckTransform;
     public LayerMask groundMask;
-
-    private GameManagerBehavior _gameManagerBehavior;
+    
     private CharacterController _characterController;
     private float _turnSmoothVelocity;
     private Vector3 _velocity;
@@ -29,8 +29,8 @@ public class PlayerBehavior : MonoBehaviour {
         _currentPickUpAble = null;
         Animal = Animal.Rabbit;
         
-        _gameManagerBehavior = GameObject.Find("GameManager").GetComponent<GameManagerBehavior>();
-        _gameManagerBehavior.AllAnimals.Add(new Tuple<GameObject, Animal>(gameObject, Animal));
+        GameManagerBehavior = GameObject.Find("GameManager").GetComponent<GameManagerBehavior>();
+        GameManagerBehavior.AllAnimals.Add(new Tuple<GameObject, Animal>(gameObject, Animal));
     }
 
     private void Update() {

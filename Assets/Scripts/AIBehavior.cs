@@ -118,8 +118,8 @@ public class AIBehavior : MonoBehaviour {
         if (other.name.Equals("Weapon")) {
             // TODO: Make it take damage instead of destroying it!
             Destroy(gameObject);
-            var toRemove = GameManagerBehavior.AllAnimals.Where(tuple => gameObject == tuple.Item1).ToList();
-            foreach (var removeMe in toRemove) {
+            var toRemoveList = GameManagerBehavior.AllAnimals.Where(tuple => gameObject == tuple.Item1).ToList();
+            foreach (var removeMe in toRemoveList) {
                 GameManagerBehavior.AllAnimals.Remove(removeMe);
             }
         }
