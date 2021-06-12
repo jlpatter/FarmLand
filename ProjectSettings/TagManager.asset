@@ -7,6 +7,7 @@ TagManager:
   - PickUpAble
   - Rabbit
   - Cow
+  - Pig
   layers:
   - Default
   - TransparentFX
