@@ -7,7 +7,7 @@ namespace AnimalBehavior {
     public class AIBehavior : MonoBehaviour {
         public AnimalTypes AnimalType { get; private set; }
         public GameManagerBehavior GameManagerBehavior { get; private set; }
-        public PlayerHealthBar HealthBar { get; private set; }
+        public AIHealthBar HealthBar { get; private set; }
         public float Health { get; set; }
     
         public Transform groundCheckTransform;
@@ -65,10 +65,11 @@ namespace AnimalBehavior {
 
             GameManagerBehavior = GameObject.Find("GameManager").GetComponent<GameManagerBehavior>();
             GameManagerBehavior.AllAnimals.Add(new Tuple<GameObject, AnimalTypes>(gameObject, AnimalType));
-            HealthBar = gameObject.GetComponentInChildren<PlayerHealthBar>();
+            HealthBar = gameObject.GetComponentInChildren<AIHealthBar>();
             _speed = GameManagerBehavior.AnimalAttributesDict[AnimalType].Speed;
             Health = GameManagerBehavior.AnimalAttributesDict[AnimalType].Health;
             HealthBar.SetMaxHealth(Health);
+            HealthBar.SetHealth(Health);
         
             _barnInterior = GameObject.Find(AnimalType + "Barn").transform.Find("Middle").gameObject;
             _barnEntrance = GameObject.Find(AnimalType + "Barn").transform.Find("Entrance").gameObject;
