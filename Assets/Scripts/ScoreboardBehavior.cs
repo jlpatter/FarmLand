@@ -23,44 +23,44 @@ public class ScoreboardBehavior : MonoBehaviour {
         _chickenScoreText = GameObject.Find("ChickenScoreText").GetComponent<Text>();
     }
 
-    public void AddPoint(Animal animal) {
-        switch (animal) {
-            case Animal.Rabbit:
+    public void AddPoint(AnimalTypes animalType) {
+        switch (animalType) {
+            case AnimalTypes.Rabbit:
                 _rabbitScore++;
                 _rabbitScoreText.text = "Rabbit Score: " + _rabbitScore;
                 break;
-            case Animal.Cow:
+            case AnimalTypes.Cow:
                 _cowScore++;
                 _cowScoreText.text = "Cow Score: " + _cowScore;
                 break;
-            case Animal.Pig:
+            case AnimalTypes.Pig:
                 _pigScore++;
                 _pigScoreText.text = "Pig Score: " + _pigScore;
                 break;
-            case Animal.Chicken:
+            case AnimalTypes.Chicken:
                 _chickenScore++;
                 _chickenScoreText.text = "Chicken Score: " + _chickenScore;
                 break;
             default:
-                throw new ArgumentOutOfRangeException(nameof(animal), animal, null);
+                throw new ArgumentOutOfRangeException(nameof(animalType), animalType, null);
         }
     }
 
-    public void RemovePoint(Animal animal) {
+    public void RemovePoint(AnimalTypes animal) {
         switch (animal) {
-            case Animal.Rabbit:
+            case AnimalTypes.Rabbit:
                 _rabbitScore--;
                 _rabbitScoreText.text = "Rabbit Score: " + _rabbitScore;
                 break;
-            case Animal.Cow:
+            case AnimalTypes.Cow:
                 _cowScore--;
                 _cowScoreText.text = "Cow Score: " + _cowScore;
                 break;
-            case Animal.Pig:
+            case AnimalTypes.Pig:
                 _pigScore--;
                 _pigScoreText.text = "Pig Score: " + _pigScore;
                 break;
-            case Animal.Chicken:
+            case AnimalTypes.Chicken:
                 _chickenScore--;
                 _chickenScoreText.text = "Chicken Score: " + _chickenScore;
                 break;

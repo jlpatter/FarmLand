@@ -5,7 +5,7 @@ namespace AnimalBehavior {
     public class CowBehavior : AIBehavior {
         private new void OnTriggerEnter(Collider other) {
             var aiBehavior = other.gameObject.GetComponent<AIBehavior>();
-            if (aiBehavior != null && aiBehavior.Animal != Animal) {
+            if (aiBehavior != null && aiBehavior.AnimalType != AnimalType) {
                 // TODO: Make it take damage instead of destroying it!
                 Destroy(other.gameObject);
                 var toRemoveList = aiBehavior.GameManagerBehavior.AllAnimals.Where(myTuple => myTuple.Item1 == other.gameObject).ToList();
@@ -15,7 +15,7 @@ namespace AnimalBehavior {
             }
 
             var playerBehavior = other.gameObject.GetComponent<PlayerBehavior>();
-            if (playerBehavior != null && playerBehavior.Animal != Animal) {
+            if (playerBehavior != null && playerBehavior.AnimalType != AnimalType) {
                 // TODO: Make it take damage instead of destroying it!
                 Destroy(other.gameObject);
                 var toRemoveList = playerBehavior.GameManagerBehavior.AllAnimals.Where(myTuple => myTuple.Item1 == other.gameObject).ToList();

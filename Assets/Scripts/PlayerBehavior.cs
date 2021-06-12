@@ -3,7 +3,7 @@ using UnityEngine;
 
 public class PlayerBehavior : MonoBehaviour {
 
-    public Animal Animal { get; private set; }
+    public AnimalTypes AnimalType { get; private set; }
     public GameManagerBehavior GameManagerBehavior { get; private set; }
     
     public GameObject weapon;
@@ -27,10 +27,10 @@ public class PlayerBehavior : MonoBehaviour {
         _characterController = GetComponent<CharacterController>();
         _hasPickUpAble = false;
         _currentPickUpAble = null;
-        Animal = Animal.Rabbit;
+        AnimalType = AnimalTypes.Rabbit;
         
         GameManagerBehavior = GameObject.Find("GameManager").GetComponent<GameManagerBehavior>();
-        GameManagerBehavior.AllAnimals.Add(new Tuple<GameObject, Animal>(gameObject, Animal));
+        GameManagerBehavior.AllAnimals.Add(new Tuple<GameObject, AnimalTypes>(gameObject, AnimalType));
     }
 
     private void Update() {
@@ -86,7 +86,7 @@ public class PlayerBehavior : MonoBehaviour {
                 if (_hasPickUpAble) {
                     _currentPickUpAble.transform.position = transform.position + new Vector3(0.0f, _currentPickUpAble.transform.localScale.y, 0.0f);
                     _currentPickUpAble.transform.parent = transform;
-                    _currentPickUpAble.GetComponent<PickUpAbleBehavior>().HasFollowerDictionary[Animal] = false;
+                    _currentPickUpAble.GetComponent<PickUpAbleBehavior>().HasFollowerDictionary[AnimalType] = false;
                     var tempCurrentPickUpAbleRb = _currentPickUpAble.GetComponent<Rigidbody>();
                     tempCurrentPickUpAbleRb.useGravity = false;
                     tempCurrentPickUpAbleRb.isKinematic = true;

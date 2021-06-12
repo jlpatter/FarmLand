@@ -5,7 +5,7 @@ using Random = UnityEngine.Random;
 
 namespace AnimalBehavior {
     public class AIBehavior : MonoBehaviour {
-        public Animal Animal { get; private set; }
+        public AnimalTypes AnimalType { get; private set; }
         public GameManagerBehavior GameManagerBehavior { get; private set; }
     
         public Transform groundCheckTransform;
@@ -30,6 +30,7 @@ namespace AnimalBehavior {
         private const float Gravity = -9.81f;
         private const float GroundDistance = 0.4f;
         private const float EnemySensoryRange = 20.0f;
+        private const float WeaponDamage = 20.0f;
 
         private enum AIState {
             IsGrazing,
@@ -49,25 +50,25 @@ namespace AnimalBehavior {
             _currentEnemy = null;
 
             if (name.Contains("Rabbit")) {
-                Animal = Animal.Rabbit;
+                AnimalType = AnimalTypes.Rabbit;
             }
             else if (name.Contains("Cow")) {
-                Animal = Animal.Cow;
+                AnimalType = AnimalTypes.Cow;
             }
             else if (name.Contains("Pig")) {
-                Animal = Animal.Pig;
+                AnimalType = AnimalTypes.Pig;
             }
             else if (name.Contains("Chicken")) {
-                Animal = Animal.Chicken;
+                AnimalType = AnimalTypes.Chicken;
             }
 
             GameManagerBehavior = GameObject.Find("GameManager").GetComponent<GameManagerBehavior>();
-            GameManagerBehavior.AllAnimals.Add(new Tuple<GameObject, Animal>(gameObject, Animal));
-            _speed = GameManagerBehavior.AnimalAttributesDict[Animal].Speed;
-            _health = GameManagerBehavior.AnimalAttributesDict[Animal].Health;
+            GameManagerBehavior.AllAnimals.Add(new Tuple<GameObject, AnimalTypes>(gameObject, AnimalType));
+            _speed = GameManagerBehavior.AnimalAttributesDict[AnimalType].Speed;
+            _health = GameManagerBehavior.AnimalAttributesDict[AnimalType].Health;
         
-            _barnInterior = GameObject.Find(Animal + "Barn").transform.Find("Middle").gameObject;
-            _barnEntrance = GameObject.Find(Animal + "Barn").transform.Find("Entrance").gameObject;
+            _barnInterior = GameObject.Find(AnimalType + "Barn").transform.Find("Middle").gameObject;
+            _barnEntrance = GameObject.Find(AnimalType + "Barn").transform.Find("Entrance").gameObject;
         }
 
         private void Update() {
@@ -119,11 +120,14 @@ namespace AnimalBehavior {
 
         protected void OnTriggerEnter(Collider other) {
             if (other.name.Equals("Weapon")) {
-                // TODO: Make it take damage instead of destroying it!
-                Destroy(gameObject);
-                var toRemoveList = GameManagerBehavior.AllAnimals.Where(tuple => gameObject == tuple.Item1).ToList();
-                foreach (var removeMe in toRemoveList) {
-                    GameManagerBehavior.AllAnimals.Remove(removeMe);
+                _health -= WeaponDamage;
+
+                if (_health <= 0.0f) {
+                    var toRemoveList = GameManagerBehavior.AllAnimals.Where(tuple => gameObject == tuple.Item1).ToList();
+                    foreach (var removeMe in toRemoveList) {
+                        GameManagerBehavior.AllAnimals.Remove(removeMe);
+                    }
+                    Destroy(gameObject);
                 }
             }
         }
@@ -132,10 +136,10 @@ namespace AnimalBehavior {
             var pickUpAbles = GameObject.FindGameObjectsWithTag("PickUpAble");
             foreach (var pickUpAble in pickUpAbles) {
                 var pickUpAbleBehavior = pickUpAble.GetComponent<PickUpAbleBehavior>();
-                if (!pickUpAbleBehavior.HasFollowerDictionary[Animal]) {
+                if (!pickUpAbleBehavior.HasFollowerDictionary[AnimalType]) {
                     _targetPickUpAble = pickUpAble;
                     _currentState = AIState.IsTravelingToPickUpAble;
-                    pickUpAbleBehavior.HasFollowerDictionary[Animal] = true;
+                    pickUpAbleBehavior.HasFollowerDictionary[AnimalType] = true;
                     break;
                 }
             }
@@ -147,7 +151,7 @@ namespace AnimalBehavior {
 
         private void FindEnemy() {
             foreach (var (animalGameObject, animal) in GameManagerBehavior.AllAnimals) {
-                if ((animalGameObject.transform.position - transform.position).magnitude < EnemySensoryRange && animal != Animal) {
+                if ((animalGameObject.transform.position - transform.position).magnitude < EnemySensoryRange && animal != AnimalType) {
                     _currentState = AIState.FollowEnemy;
                     _currentEnemy = animalGameObject;
                 }
@@ -205,7 +209,7 @@ namespace AnimalBehavior {
                     tempCurrentPickUpAbleRb.isKinematic = false;
                     _targetPickUpAble.transform.localPosition += new Vector3(0.0f, 0.0f, _targetPickUpAble.transform.localScale.z);
                     _targetPickUpAble.transform.parent = null;
-                    _targetPickUpAble.GetComponent<PickUpAbleBehavior>().HasFollowerDictionary[Animal] = false;
+                    _targetPickUpAble.GetComponent<PickUpAbleBehavior>().HasFollowerDictionary[AnimalType] = false;
                     _targetPickUpAble = null;
                     _hasPickUpAble = false;
                 }

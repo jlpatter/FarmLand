@@ -1,4 +1,4 @@
-﻿public enum Animal {
+﻿public enum AnimalTypes {
     Rabbit,
     Cow,
     Pig,
