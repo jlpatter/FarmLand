@@ -12,5 +12,6 @@ public class GameManagerBehavior : MonoBehaviour {
         AnimalAttributesDict[AnimalTypes.Rabbit] = new AnimalAttributes(5.0f, 50.0f);
         AnimalAttributesDict[AnimalTypes.Cow] = new AnimalAttributes(2.0f, 100.0f);
         AnimalAttributesDict[AnimalTypes.Pig] = new AnimalAttributes(3.0f, 75.0f);
+        // TODO: Add Chicken Here!
     }
 }
