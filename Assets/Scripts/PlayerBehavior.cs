@@ -1,4 +1,5 @@
 using System;
+using Cinemachine;
 using StartMenu;
 using UnityEngine;
 
@@ -15,6 +16,8 @@ public class PlayerBehavior : MonoBehaviour {
     // TODO: Add chicken prefab.
     
     public GameObject weapon;
+    public GameObject pauseCanvas;
+    public CinemachineFreeLook cinemachineFreeLook;
     public Transform cameraTransform;
     public Transform groundCheckTransform;
     public LayerMask groundMask;
@@ -77,6 +80,7 @@ public class PlayerBehavior : MonoBehaviour {
         MovePlayer();
         SwingWeapon();
         PickUpAndDropStuff();
+        OpenClosePauseMenu();
     }
 
     private void MovePlayer() {
@@ -139,6 +143,21 @@ public class PlayerBehavior : MonoBehaviour {
                 _currentPickUpAble.transform.parent = null;
                 _currentPickUpAble = null;
                 _hasPickUpAble = false;
+            }
+        }
+    }
+
+    private void OpenClosePauseMenu() {
+        if (Input.GetKeyDown(KeyCode.Escape)) {
+            if (pauseCanvas.activeSelf) {
+                pauseCanvas.SetActive(false);
+                cinemachineFreeLook.m_YAxis.m_InputAxisName = "Mouse Y";
+                cinemachineFreeLook.m_XAxis.m_InputAxisName = "Mouse X";
+            }
+            else {
+                pauseCanvas.SetActive(true);
+                cinemachineFreeLook.m_YAxis.m_InputAxisName = "";
+                cinemachineFreeLook.m_XAxis.m_InputAxisName = "";
             }
         }
     }
