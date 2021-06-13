@@ -114,13 +114,12 @@ public class PlayerBehavior : MonoBehaviour {
         if (Input.GetKeyDown(KeyCode.E)) {
             if (!_hasPickUpAble) {
                 var allPickUpAbles = GameObject.FindGameObjectsWithTag("PickUpAble");
-                var currentMagnitude = float.PositiveInfinity;
                 foreach (var pickUpAble in allPickUpAbles) {
                     var tempMagnitude = (pickUpAble.transform.position - transform.position).magnitude;
-                    if (tempMagnitude < currentMagnitude && tempMagnitude < 2.0f) {
+                    if (tempMagnitude < 2.0f) {
                         _currentPickUpAble = pickUpAble;
                         _hasPickUpAble = true;
-                        currentMagnitude = tempMagnitude;
+                        break;
                     }
                 }
                 if (_hasPickUpAble) {
