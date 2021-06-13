@@ -17,6 +17,8 @@ namespace AnimalBehavior {
                     foreach (var removeMe in toRemoveList) {
                         aiBehavior.GameManagerBehavior.AllAnimals.Remove(removeMe);
                     }
+                    
+                    PickUpAbleBehavior.DeParent(gameObject, aiBehavior.AnimalType);
                     Destroy(other.gameObject);
                 }
             }
@@ -31,6 +33,8 @@ namespace AnimalBehavior {
                     foreach (var removeMe in toRemoveList) {
                         playerBehavior.GameManagerBehavior.AllAnimals.Remove(removeMe);
                     }
+                    
+                    PickUpAbleBehavior.DeParent(gameObject, playerBehavior.AnimalType);
                     Destroy(other.gameObject);
                 }
             }

@@ -132,6 +132,8 @@ namespace AnimalBehavior {
                     foreach (var removeMe in toRemoveList) {
                         GameManagerBehavior.AllAnimals.Remove(removeMe);
                     }
+
+                    PickUpAbleBehavior.DeParent(gameObject, AnimalType);
                     Destroy(gameObject);
                 }
             }
