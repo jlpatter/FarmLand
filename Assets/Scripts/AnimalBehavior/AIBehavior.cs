@@ -24,6 +24,7 @@ namespace AnimalBehavior {
         private GameObject _targetPickUpAble;
         private GameObject _barnEntrance;
         private GameObject _barnInterior;
+        private GameObject[] _pickUpAbles;
         private bool _hasPickUpAble;
         private float _speed;
 
@@ -73,6 +74,7 @@ namespace AnimalBehavior {
         
             _barnInterior = GameObject.Find(AnimalType + "Barn").transform.Find("Middle").gameObject;
             _barnEntrance = GameObject.Find(AnimalType + "Barn").transform.Find("Entrance").gameObject;
+            _pickUpAbles = GameObject.FindGameObjectsWithTag("PickUpAble");
         }
 
         private void Update() {
@@ -140,8 +142,7 @@ namespace AnimalBehavior {
         }
 
         private void FindPickUpAble() {
-            var pickUpAbles = GameObject.FindGameObjectsWithTag("PickUpAble");
-            foreach (var pickUpAble in pickUpAbles) {
+            foreach (var pickUpAble in _pickUpAbles) {
                 var pickUpAbleBehavior = pickUpAble.GetComponent<PickUpAbleBehavior>();
                 if (!pickUpAbleBehavior.HasFollowerDictionary[AnimalType]) {
                     _targetPickUpAble = pickUpAble;
