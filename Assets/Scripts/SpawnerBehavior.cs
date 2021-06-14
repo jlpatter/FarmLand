@@ -6,7 +6,13 @@ public class SpawnerBehavior : MonoBehaviour {
     
     private void Start() {
         for (var i = 0; i < numToSpawn; i++) {
-            Instantiate(prefabToSpawn, transform.position, Quaternion.identity);
+            Instantiate(prefabToSpawn, transform.position, Quaternion.identity, transform);
+        }
+    }
+
+    private void Update() {
+        if (transform.childCount < numToSpawn) {
+            Instantiate(prefabToSpawn, transform.position, Quaternion.identity, transform);
         }
     }
 }
