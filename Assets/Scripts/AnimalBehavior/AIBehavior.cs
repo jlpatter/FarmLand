@@ -102,9 +102,14 @@ namespace AnimalBehavior {
 
             switch (currentState) {
                 case AIState.IsGrazing:
-                    PickRandomDirection();
-                    FindEnemy();
-                    FindPickUpAble();
+                    if (_isInBarn) {
+                        currentState = AIState.IsTravelingToBarnEntrance;
+                    }
+                    else {
+                        PickRandomDirection();
+                        FindEnemy();
+                        FindPickUpAble();
+                    }
                     break;
                 case AIState.FollowEnemy:
                     FollowEnemy();
@@ -202,7 +207,12 @@ namespace AnimalBehavior {
         private void SetPickupAble(GameObject pickUpAble, PickUpAbleBehavior pickUpAbleBehavior) {
             _targetPickUpAble = pickUpAble;
             _targetPickUpAbleBehavior = pickUpAbleBehavior;
-            currentState = AIState.IsTravelingToPickUpAble;
+            if (_targetPickUpAbleBehavior.Barn != null) {
+                currentState = AIState.IsTravelingToEnemyBarnEntrance;
+            }
+            else {
+                currentState = AIState.IsTravelingToPickUpAble;
+            }
             pickUpAbleBehavior.HasFollowerDictionary[AnimalType] = true;
         }
 
@@ -268,7 +278,12 @@ namespace AnimalBehavior {
         private void FollowBarnEntrance() {
             currentDirection = (_myBarnEntrance.transform.position - transform.position).normalized;
             if ((_myBarnEntrance.transform.position - transform.position).magnitude < 2.0f) {
-                currentState = AIState.IsTravelingToBarnInterior;
+                if (_isCarryingPickUpAble) {
+                    currentState = AIState.IsTravelingToBarnInterior;
+                }
+                else {
+                    currentState = AIState.IsGrazing;
+                }
             }
         }
 
