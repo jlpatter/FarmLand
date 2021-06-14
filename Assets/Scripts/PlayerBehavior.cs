@@ -18,9 +18,6 @@ public class PlayerBehavior : MonoBehaviour {
     // TODO: Add chicken prefab.
     
     public GameObject weapon;
-    public GameObject pauseCanvas;
-    public CinemachineFreeLook cinemachineFreeLook;
-    public Transform cameraTransform;
     public Transform groundCheckTransform;
     public LayerMask groundMask;
     
@@ -82,7 +79,9 @@ public class PlayerBehavior : MonoBehaviour {
         GameManagerBehavior = GameObject.Find("GameManager").GetComponent<GameManagerBehavior>();
         GameManagerBehavior.AllAnimals.Add(new Tuple<GameObject, AnimalTypes>(gameObject, AnimalType));
         Health = GameManagerBehavior.AnimalAttributesDict[AnimalType].Health;
-        GameObject.Find("HealthBar").GetComponent<PlayerHealthBar>().SetMaxHealth(Health);
+        var healthBar = GameObject.Find("HealthBar").GetComponent<PlayerHealthBar>();
+        healthBar.SetMaxHealth(Health);
+        healthBar.SetHealth(Health);
         Speed = GameManagerBehavior.AnimalAttributesDict[AnimalType].Speed;
     }
 
@@ -92,7 +91,6 @@ public class PlayerBehavior : MonoBehaviour {
             SwingWeapon();
         }
         PickUpAndDropStuff();
-        OpenClosePauseMenu();
     }
 
     private void OnTriggerEnter(Collider other) {
@@ -120,7 +118,7 @@ public class PlayerBehavior : MonoBehaviour {
 
         if (direction.magnitude >= 0.1f) {
 
-            var targetAngle = Mathf.Atan2(direction.x, direction.z) * Mathf.Rad2Deg + cameraTransform.eulerAngles.y;
+            var targetAngle = Mathf.Atan2(direction.x, direction.z) * Mathf.Rad2Deg + Camera.main.transform.eulerAngles.y;
             var angle = Mathf.SmoothDampAngle(transform.eulerAngles.y, targetAngle, ref _turnSmoothVelocity, TurnSmoothTime);
             transform.rotation = Quaternion.Euler(0.0f, angle, 0.0f);
 
@@ -185,23 +183,6 @@ public class PlayerBehavior : MonoBehaviour {
                 _currentPickUpAble.transform.parent = null;
                 _currentPickUpAble = null;
                 _hasPickUpAble = false;
-            }
-        }
-    }
-
-    private void OpenClosePauseMenu() {
-        if (Input.GetKeyDown(KeyCode.Escape)) {
-            if (pauseCanvas.activeSelf) {
-                pauseCanvas.SetActive(false);
-                Cursor.visible = false;
-                cinemachineFreeLook.m_YAxis.m_InputAxisName = "Mouse Y";
-                cinemachineFreeLook.m_XAxis.m_InputAxisName = "Mouse X";
-            }
-            else {
-                pauseCanvas.SetActive(true);
-                Cursor.visible = true;
-                cinemachineFreeLook.m_YAxis.m_InputAxisName = "";
-                cinemachineFreeLook.m_XAxis.m_InputAxisName = "";
             }
         }
     }
