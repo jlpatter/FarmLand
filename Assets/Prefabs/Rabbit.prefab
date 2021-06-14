@@ -285,7 +285,7 @@ GameObject:
   m_Component:
   - component: {fileID: 6512321456158732488}
   - component: {fileID: 6512321456158732495}
-  - component: {fileID: 647357194822880041}
+  - component: {fileID: 7159278890493871742}
   m_Layer: 0
   m_Name: Rabbit
   m_TagString: Untagged
@@ -323,13 +323,13 @@ CharacterController:
   m_Enabled: 1
   serializedVersion: 2
   m_Height: 0
-  m_Radius: 0.26
+  m_Radius: 0.17
   m_SlopeLimit: 45
   m_StepOffset: 0.3
   m_SkinWidth: 0.08
   m_MinMoveDistance: 0.001
-  m_Center: {x: 0, y: 0.14, z: 0}
---- !u!114 &647357194822880041
+  m_Center: {x: 0, y: 0.06, z: 0}
+--- !u!114 &7159278890493871742
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -338,13 +338,14 @@ MonoBehaviour:
   m_GameObject: {fileID: 6512321456158732489}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c09fbf9b867bbdc429d24af6b4f8233b, type: 3}
+  m_Script: {fileID: 11500000, guid: e2b2d2abf9a692e4598eb34e45fc1048, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   groundCheckTransform: {fileID: 6512321456041371618}
   groundMask:
     serializedVersion: 2
     m_Bits: 64
+  weapon: {fileID: 6512321455018840753}
 --- !u!1 &7102891295162417863
 GameObject:
   m_ObjectHideFlags: 0

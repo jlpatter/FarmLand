@@ -13,15 +13,15 @@ namespace AnimalBehavior {
     
         public Transform groundCheckTransform;
         public LayerMask groundMask;
-    
-        private AIState _currentState;
+
+        protected AIState currentState;
         private CharacterController _characterController;
         private float _turnSmoothVelocity;
         private Vector3 _velocity;
         private bool _isGrounded;
         private float _timer;
-        private Vector3 _currentDirection;
-        private GameObject _currentEnemy;
+        protected Vector3 currentDirection;
+        protected GameObject currentEnemy;
         private GameObject _targetPickUpAble;
         private PickUpAbleBehavior _targetPickUpAbleBehavior;
         private GameObject _barn;
@@ -34,10 +34,10 @@ namespace AnimalBehavior {
         private const float TurnSmoothTime = 0.1f;
         private const float Gravity = -9.81f;
         private const float GroundDistance = 0.4f;
-        private const float EnemySensoryRange = 20.0f;
+        protected const float EnemySensoryRange = 20.0f;
         private const float WeaponDamage = 20.0f;
 
-        private enum AIState {
+        protected enum AIState {
             IsGrazing,
             FollowEnemy,
             IsTravelingToPickUpAble,
@@ -53,8 +53,8 @@ namespace AnimalBehavior {
             _targetPickUpAble = null;
             _targetPickUpAbleBehavior = null;
             _hasPickUpAble = false;
-            _currentState = AIState.IsGrazing;
-            _currentEnemy = null;
+            currentState = AIState.IsGrazing;
+            currentEnemy = null;
 
             if (name.Contains("Rabbit")) {
                 AnimalType = AnimalTypes.Rabbit;
@@ -96,7 +96,7 @@ namespace AnimalBehavior {
                 _velocity.y = -2.0f;
             }
 
-            switch (_currentState) {
+            switch (currentState) {
                 case AIState.IsGrazing:
                     PickRandomDirection();
                     FindEnemy();
@@ -126,9 +126,9 @@ namespace AnimalBehavior {
                 default:
                     throw new ArgumentOutOfRangeException();
             }
-            if (_currentDirection.magnitude >= 0.1f) {
+            if (currentDirection.magnitude >= 0.1f) {
 
-                var targetAngle = Mathf.Atan2(_currentDirection.x, _currentDirection.z) * Mathf.Rad2Deg;
+                var targetAngle = Mathf.Atan2(currentDirection.x, currentDirection.z) * Mathf.Rad2Deg;
                 var angle = Mathf.SmoothDampAngle(transform.eulerAngles.y, targetAngle, ref _turnSmoothVelocity, TurnSmoothTime);
                 transform.rotation = Quaternion.Euler(0.0f, angle, 0.0f);
 
@@ -140,7 +140,7 @@ namespace AnimalBehavior {
             _characterController.Move(_velocity * Time.deltaTime);
         }
 
-        protected void OnTriggerEnter(Collider other) {
+        protected virtual void OnTriggerEnter(Collider other) {
             if (other.name.Equals("Weapon")) {
                 Health -= WeaponDamage;
                 HealthBar.SetHealth(Health);
@@ -177,72 +177,72 @@ namespace AnimalBehavior {
         private void SetPickupAble(GameObject pickUpAble, PickUpAbleBehavior pickUpAbleBehavior) {
             _targetPickUpAble = pickUpAble;
             _targetPickUpAbleBehavior = pickUpAbleBehavior;
-            _currentState = AIState.IsTravelingToPickUpAble;
+            currentState = AIState.IsTravelingToPickUpAble;
             pickUpAbleBehavior.HasFollowerDictionary[AnimalType] = true;
         }
 
         private void FindEnemy() {
             foreach (var (animalGameObject, animal) in GameManagerBehavior.AllAnimals) {
                 if ((animalGameObject.transform.position - transform.position).magnitude < EnemySensoryRange && animal != AnimalType) {
-                    _currentState = AIState.FollowEnemy;
-                    _currentEnemy = animalGameObject;
+                    currentState = AIState.FollowEnemy;
+                    currentEnemy = animalGameObject;
                 }
             }
         }
 
-        private void FollowEnemy() {
-            if (_currentEnemy != null) {
-                _currentDirection = (_currentEnemy.transform.position - transform.position).normalized;
-                if ((_currentEnemy.transform.position - transform.position).magnitude > EnemySensoryRange) {
-                    _currentState = AIState.IsGrazing;
+        protected virtual void FollowEnemy() {
+            if (currentEnemy != null) {
+                currentDirection = (currentEnemy.transform.position - transform.position).normalized;
+                if ((currentEnemy.transform.position - transform.position).magnitude > EnemySensoryRange) {
+                    currentState = AIState.IsGrazing;
                 }
             }
             else {
-                _currentState = AIState.IsGrazing;
+                currentState = AIState.IsGrazing;
             }
         }
 
         private void FollowPickUpAble() {
             if (!_targetPickUpAbleBehavior.IsBeingCarried) {
                 if (_targetPickUpAbleBehavior.Barn == null) {
-                    _currentDirection = (_targetPickUpAble.transform.position - transform.position).normalized;
+                    currentDirection = (_targetPickUpAble.transform.position - transform.position).normalized;
                 }
                 else {
-                    _currentState = AIState.IsTravelingToEnemyBarnEntrance;
+                    currentState = AIState.IsTravelingToEnemyBarnEntrance;
                 }
             }
             else {
-                _currentState = AIState.IsGrazing;
+                currentState = AIState.IsGrazing;
             }
         }
 
         private void FollowEnemyBarnEntrance() {
             if (_targetPickUpAbleBehavior.Barn != null) {
-                _currentDirection = (_targetPickUpAbleBehavior.Barn.transform.Find("Entrance").position - transform.position).normalized;
+                currentDirection = (_targetPickUpAbleBehavior.Barn.transform.Find("Entrance").position - transform.position).normalized;
                 if ((_targetPickUpAbleBehavior.Barn.transform.Find("Entrance").position - transform.position).magnitude < 2.0f) {
-                    _currentState = AIState.IsTravelingToEnemyBarnInterior;
+                    currentState = AIState.IsTravelingToEnemyBarnInterior;
                 }
             }
             else {
-                _currentState = AIState.IsTravelingToPickUpAble;
+                currentState = AIState.IsTravelingToPickUpAble;
             }
         }
 
         private void FollowEnemyBarnInterior() {
-            _currentDirection = (_targetPickUpAble.transform.position - transform.position).normalized;
+            currentDirection = (_targetPickUpAble.transform.position - transform.position).normalized;
         }
 
         private void FollowBarnEntrance() {
-            _currentDirection = (_barnEntrance.transform.position - transform.position).normalized;
+            currentDirection = (_barnEntrance.transform.position - transform.position).normalized;
             if ((_barnEntrance.transform.position - transform.position).magnitude < 2.0f) {
-                _currentState = AIState.IsTravelingToBarnInterior;
+                currentState = AIState.IsTravelingToBarnInterior;
             }
         }
 
         private void FollowBarnInterior() {
-            _currentDirection = (_barnInterior.transform.position - transform.position).normalized;
+            currentDirection = (_barnInterior.transform.position - transform.position).normalized;
             if ((_barnInterior.transform.position - transform.position).magnitude < 2.0f) {
-                _currentState = AIState.IsGrazing;
+                currentState = AIState.IsGrazing;
             }
         }
     
@@ -257,12 +257,12 @@ namespace AnimalBehavior {
                     tempCurrentPickUpAbleRb.isKinematic = true;
                     _hasPickUpAble = true;
                     _targetPickUpAbleBehavior.IsBeingCarried = true;
-                    _currentState = AIState.IsTravelingToBarnEntrance;
+                    currentState = AIState.IsTravelingToBarnEntrance;
                 }
             }
             else {
                 // TODO: Maybe replace this with a boolean?
-                if (_currentState == AIState.IsGrazing) {
+                if (currentState == AIState.IsGrazing) {
                     var tempCurrentPickUpAbleRb = _targetPickUpAble.GetComponent<Rigidbody>();
                     tempCurrentPickUpAbleRb.useGravity = true;
                     tempCurrentPickUpAbleRb.isKinematic = false;
@@ -280,7 +280,7 @@ namespace AnimalBehavior {
         private void PickRandomDirection() {
             _timer -= Time.deltaTime;
             if (_timer < 0.0f) {
-                _currentDirection = new Vector3(Random.Range(-1, 2), 0.0f, Random.Range(-1, 2)).normalized;
+                currentDirection = new Vector3(Random.Range(-1, 2), 0.0f, Random.Range(-1, 2)).normalized;
                 _timer = Random.Range(1.0f, 3.0f);
             }
         }

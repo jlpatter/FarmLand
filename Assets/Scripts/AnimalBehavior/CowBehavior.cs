@@ -5,8 +5,8 @@ namespace AnimalBehavior {
     public class CowBehavior : AIBehavior {
 
         private const float TrampleStrength = 1.0f;
-        
-        private new void OnTriggerEnter(Collider other) {
+
+        protected override void OnTriggerEnter(Collider other) {
             TrampleAIAndPlayer(other);
             base.OnTriggerEnter(other);
         }
