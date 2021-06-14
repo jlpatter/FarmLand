@@ -1,4 +1,6 @@
 using System;
+using System.Linq;
+using AnimalBehavior;
 using Cinemachine;
 using StartMenu;
 using UnityEngine;
@@ -32,6 +34,7 @@ public class PlayerBehavior : MonoBehaviour {
     private const float TurnSmoothTime = 0.1f;
     private const float Gravity = -9.81f;
     private const float GroundDistance = 0.4f;
+    private const float TrampleStrength = 1.0f;
 
     private void Start() {
         _characterController = GetComponent<CharacterController>();
@@ -47,19 +50,25 @@ public class PlayerBehavior : MonoBehaviour {
                 AnimalType = AnimalTypes.Cow;
                 transform.position = GameObject.Find(AnimalType + "Spawner").transform.position;
                 Instantiate(cowPrefab, transform.position, Quaternion.Euler(-90.0f, 0.0f, 0.0f), transform);
+                
+                var boxCollider = gameObject.AddComponent<BoxCollider>();
+                boxCollider.isTrigger = true;
+                boxCollider.center = new Vector3(0.03f, -0.63f, 0.0f);
+                boxCollider.size = new Vector3(0.7f, 1.94f, 1.85f);
+                
                 groundCheckTransform.localPosition = new Vector3(groundCheckTransform.localPosition.x, -0.635f, groundCheckTransform.localPosition.z);
-                _characterController.center = new Vector3(_characterController.center.x, 0.3f, _characterController.center.z);
-                _characterController.radius = 0.98f;
-                _characterController.height = 1.49f;
+                _characterController.center = new Vector3(_characterController.center.x, 0.06f, _characterController.center.z);
+                _characterController.radius = 0.32f;
+                _characterController.height = 1.15f;
                 break;
             case 2:
                 AnimalType = AnimalTypes.Pig;
                 transform.position = GameObject.Find(AnimalType + "Spawner").transform.position;
                 Instantiate(pigPrefab, transform.position, Quaternion.Euler(-90.0f, 0.0f, 0.0f), transform);
                 groundCheckTransform.localPosition = new Vector3(groundCheckTransform.localPosition.x, -0.359f, groundCheckTransform.localPosition.z);
-                _characterController.center = new Vector3(_characterController.center.x, 0.42f, _characterController.center.z);
-                _characterController.radius = 0.68f;
-                _characterController.height = 0.0f;
+                _characterController.center = new Vector3(_characterController.center.x, 0.09f, _characterController.center.z);
+                _characterController.radius = 0.17f;
+                _characterController.height = 0.63f;
                 break;
             case 3:
                 AnimalType = AnimalTypes.Chicken;
@@ -78,9 +87,23 @@ public class PlayerBehavior : MonoBehaviour {
 
     private void Update() {
         MovePlayer();
-        SwingWeapon();
+        if (AnimalType == AnimalTypes.Rabbit) {
+            SwingWeapon();
+        }
         PickUpAndDropStuff();
         OpenClosePauseMenu();
+    }
+
+    private void OnTriggerEnter(Collider other) {
+        if (AnimalType == AnimalTypes.Cow) {
+            TrampleEnemies(other);
+        }
+    }
+
+    private void OnTriggerStay(Collider other) {
+        if (AnimalType == AnimalTypes.Cow) {
+            TrampleEnemies(other);
+        }
     }
 
     private void MovePlayer() {
@@ -111,6 +134,26 @@ public class PlayerBehavior : MonoBehaviour {
     private void SwingWeapon() {
         if (Input.GetKeyDown(KeyCode.Space)) {
             weapon.SetActive(true);
+        }
+    }
+
+    private void TrampleEnemies(Collider other) {
+        var aiBehavior = other.gameObject.GetComponent<AIBehavior>();
+        if (aiBehavior != null && aiBehavior.AnimalType != AnimalType) {
+            // TODO: Find bug here!!!
+            Debug.Log(other.transform.position + " " + transform.position);
+            aiBehavior.Health -= TrampleStrength;
+            aiBehavior.HealthBar.SetHealth(aiBehavior.Health);
+
+            if (aiBehavior.Health <= 0.0f) {
+                var toRemoveList = aiBehavior.GameManagerBehavior.AllAnimals.Where(myTuple => myTuple.Item1 == other.gameObject).ToList();
+                foreach (var removeMe in toRemoveList) {
+                    aiBehavior.GameManagerBehavior.AllAnimals.Remove(removeMe);
+                }
+                    
+                PickUpAbleBehavior.DeParent(other.gameObject, aiBehavior.AnimalType);
+                Destroy(other.gameObject);
+            }
         }
     }
 

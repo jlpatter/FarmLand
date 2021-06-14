@@ -27,7 +27,7 @@ namespace AnimalBehavior {
                         aiBehavior.GameManagerBehavior.AllAnimals.Remove(removeMe);
                     }
                     
-                    PickUpAbleBehavior.DeParent(gameObject, aiBehavior.AnimalType);
+                    PickUpAbleBehavior.DeParent(other.gameObject, aiBehavior.AnimalType);
                     Destroy(other.gameObject);
                 }
             }
@@ -43,7 +43,7 @@ namespace AnimalBehavior {
                         playerBehavior.GameManagerBehavior.AllAnimals.Remove(removeMe);
                     }
                     
-                    PickUpAbleBehavior.DeParent(gameObject, playerBehavior.AnimalType);
+                    PickUpAbleBehavior.DeParent(other.gameObject, playerBehavior.AnimalType);
                     Destroy(other.gameObject);
                 }
             }
