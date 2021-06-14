@@ -4,9 +4,18 @@ using UnityEngine;
 namespace AnimalBehavior {
     public class CowBehavior : AIBehavior {
 
-        private const float TrampleStrength = 5.0f;
+        private const float TrampleStrength = 1.0f;
         
         private new void OnTriggerEnter(Collider other) {
+            TrampleAIAndPlayer(other);
+            base.OnTriggerEnter(other);
+        }
+
+        private void OnTriggerStay(Collider other) {
+            TrampleAIAndPlayer(other);
+        }
+
+        private void TrampleAIAndPlayer(Collider other) {
             var aiBehavior = other.gameObject.GetComponent<AIBehavior>();
             if (aiBehavior != null && aiBehavior.AnimalType != AnimalType) {
                 aiBehavior.Health -= TrampleStrength;
@@ -38,7 +47,6 @@ namespace AnimalBehavior {
                     Destroy(other.gameObject);
                 }
             }
-            base.OnTriggerEnter(other);
         }
     }
 }
