@@ -47,15 +47,7 @@ namespace AnimalBehavior {
             IsTravelingToBarnInterior
         }
 
-        protected void Start() {
-            _characterController = GetComponent<CharacterController>();
-            _timer = -1.0f;
-            _targetPickUpAble = null;
-            _targetPickUpAbleBehavior = null;
-            _hasPickUpAble = false;
-            currentState = AIState.IsGrazing;
-            currentEnemy = null;
-
+        private void Awake() {
             if (name.Contains("Rabbit")) {
                 AnimalType = AnimalTypes.Rabbit;
             }
@@ -68,6 +60,16 @@ namespace AnimalBehavior {
             else if (name.Contains("Chicken")) {
                 AnimalType = AnimalTypes.Chicken;
             }
+        }
+
+        protected void Start() {
+            _characterController = GetComponent<CharacterController>();
+            _timer = -1.0f;
+            _targetPickUpAble = null;
+            _targetPickUpAbleBehavior = null;
+            _hasPickUpAble = false;
+            currentState = AIState.IsGrazing;
+            currentEnemy = null;
 
             GameManagerBehavior = GameObject.Find("GameManager").GetComponent<GameManagerBehavior>();
             GameManagerBehavior.AllAnimals.Add(new Tuple<GameObject, AnimalTypes>(gameObject, AnimalType));

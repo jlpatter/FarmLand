@@ -37,6 +37,7 @@ public class PlayerBehavior : MonoBehaviour {
     private const float TrampleStrength = 1.0f;
 
     private void Start() {
+        Cursor.visible = false;
         _characterController = GetComponent<CharacterController>();
         _hasPickUpAble = false;
         _currentPickUpAble = null;
@@ -140,8 +141,6 @@ public class PlayerBehavior : MonoBehaviour {
     private void TrampleEnemies(Collider other) {
         var aiBehavior = other.gameObject.GetComponent<AIBehavior>();
         if (aiBehavior != null && aiBehavior.AnimalType != AnimalType) {
-            // TODO: Find bug here!!!
-            Debug.Log(other.transform.position + " " + transform.position);
             aiBehavior.Health -= TrampleStrength;
             aiBehavior.HealthBar.SetHealth(aiBehavior.Health);
 
@@ -194,11 +193,13 @@ public class PlayerBehavior : MonoBehaviour {
         if (Input.GetKeyDown(KeyCode.Escape)) {
             if (pauseCanvas.activeSelf) {
                 pauseCanvas.SetActive(false);
+                Cursor.visible = false;
                 cinemachineFreeLook.m_YAxis.m_InputAxisName = "Mouse Y";
                 cinemachineFreeLook.m_XAxis.m_InputAxisName = "Mouse X";
             }
             else {
                 pauseCanvas.SetActive(true);
+                Cursor.visible = true;
                 cinemachineFreeLook.m_YAxis.m_InputAxisName = "";
                 cinemachineFreeLook.m_XAxis.m_InputAxisName = "";
             }
