@@ -1,13 +1,13 @@
+using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using UnityEngine.UI;
 
 namespace StartMenu {
     public class StartMenuButtons : MonoBehaviour {
-        public Dropdown dropdown;
+        public TMP_Dropdown tmpDropdown;
         
         public void PlayButtonPush() {
-            StartMenuValue.animal = dropdown.value;
+            StartMenuValue.animal = tmpDropdown.value;
             SceneManager.LoadScene(1);
         }
         
