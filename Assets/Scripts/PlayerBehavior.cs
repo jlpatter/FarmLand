@@ -17,7 +17,8 @@ public class PlayerBehavior : MonoBehaviour {
     public GameObject pigPrefab;
     // TODO: Add chicken prefab.
     
-    public GameObject weapon;
+    public GameObject sword;
+    public GameObject axe;
     public Transform groundCheckTransform;
     public LayerMask groundMask;
     
@@ -87,9 +88,7 @@ public class PlayerBehavior : MonoBehaviour {
 
     private void Update() {
         MovePlayer();
-        if (AnimalType == AnimalTypes.Rabbit) {
-            SwingWeapon();
-        }
+        SwingWeapon();
         PickUpAndDropStuff();
     }
 
@@ -132,7 +131,13 @@ public class PlayerBehavior : MonoBehaviour {
 
     private void SwingWeapon() {
         if (Input.GetKeyDown(KeyCode.Space)) {
-            weapon.SetActive(true);
+            if (AnimalType == AnimalTypes.Rabbit) {
+                sword.SetActive(true);
+            }
+            else if (AnimalType == AnimalTypes.Pig) {
+                axe.SetActive(true);
+                Debug.Log(axe.transform.localPosition.ToString());
+            }
         }
     }
 
