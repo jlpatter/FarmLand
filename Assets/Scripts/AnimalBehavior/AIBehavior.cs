@@ -36,8 +36,6 @@ namespace AnimalBehavior {
         private const float Gravity = -9.81f;
         private const float GroundDistance = 0.4f;
         protected const float EnemySensoryRange = 20.0f;
-        private const float WeaponDamage = 5.0f;
-        private const float AxeDamage = 7.5f;
 
         protected enum AIState {
             IsGrazing,
@@ -152,11 +150,11 @@ namespace AnimalBehavior {
 
         protected virtual void OnTriggerEnter(Collider other) {
             if (other.name.Equals("Weapon")) {
-                RemoveHealth(WeaponDamage);
+                RemoveHealth(GameManagerBehavior.SwordDamage);
             }
 
-            else if (other.name.Contains("Axe")) {
-                RemoveHealth(AxeDamage);
+            if (other.name.Contains("Axe")) {
+                RemoveHealth(GameManagerBehavior.AxeDamage);
             }
 
             if (other.name.Contains("Goal")) {

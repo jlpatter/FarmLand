@@ -6,6 +6,8 @@ using UnityEngine;
 public class GameManagerBehavior : MonoBehaviour {
     public List<Tuple<GameObject, AnimalTypes>> AllAnimals { get; private set; }
     public Dictionary<AnimalTypes, AnimalAttributes> AnimalAttributesDict { get; set; }
+    public const float SwordDamage = 5.0f;
+    public const float AxeDamage = 7.5f;
 
     public CinemachineFreeLook cinemachineFreeLook;
     public GameObject pauseCanvas;

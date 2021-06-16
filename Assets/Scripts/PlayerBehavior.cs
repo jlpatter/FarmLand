@@ -28,6 +28,7 @@ public class PlayerBehavior : MonoBehaviour {
     private bool _isGrounded;
     private bool _hasPickUpAble;
     private GameObject _currentPickUpAble;
+    private PlayerHealthBar _healthBar;
 
     private const float TurnSmoothTime = 0.1f;
     private const float Gravity = -9.81f;
@@ -39,6 +40,7 @@ public class PlayerBehavior : MonoBehaviour {
         _characterController = GetComponent<CharacterController>();
         _hasPickUpAble = false;
         _currentPickUpAble = null;
+        _healthBar = GameObject.Find("HealthBar").GetComponent<PlayerHealthBar>();
         switch (StartMenuValue.animal) {
             case 0:
                 AnimalType = AnimalTypes.Rabbit;
@@ -96,11 +98,34 @@ public class PlayerBehavior : MonoBehaviour {
         if (AnimalType == AnimalTypes.Cow) {
             TrampleEnemies(other);
         }
+        
+        if (other.name.Equals("Weapon")) {
+            RemoveHealth(GameManagerBehavior.SwordDamage);
+        }
+
+        if (other.name.Contains("Axe")) {
+            RemoveHealth(GameManagerBehavior.AxeDamage);
+        }
     }
 
     private void OnTriggerStay(Collider other) {
         if (AnimalType == AnimalTypes.Cow) {
             TrampleEnemies(other);
+        }
+    }
+
+    private void RemoveHealth(float weaponDamage) {
+        Health -= weaponDamage;
+        _healthBar.SetHealth(Health);
+
+        if (Health <= 0.0f) {
+            var toRemoveList = GameManagerBehavior.AllAnimals.Where(tuple => gameObject == tuple.Item1).ToList();
+            foreach (var removeMe in toRemoveList) {
+                GameManagerBehavior.AllAnimals.Remove(removeMe);
+            }
+
+            PickUpAbleBehavior.DeParent(gameObject, AnimalType);
+            Destroy(gameObject);
         }
     }
 
@@ -136,7 +161,6 @@ public class PlayerBehavior : MonoBehaviour {
             }
             else if (AnimalType == AnimalTypes.Pig) {
                 axe.SetActive(true);
-                Debug.Log(axe.transform.localPosition.ToString());
             }
         }
     }
