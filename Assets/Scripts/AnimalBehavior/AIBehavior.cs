@@ -37,6 +37,7 @@ namespace AnimalBehavior {
         private const float GroundDistance = 0.4f;
         protected const float EnemySensoryRange = 20.0f;
         private const float WeaponDamage = 5.0f;
+        private const float AxeDamage = 7.5f;
 
         protected enum AIState {
             IsGrazing,
@@ -151,22 +152,30 @@ namespace AnimalBehavior {
 
         protected virtual void OnTriggerEnter(Collider other) {
             if (other.name.Equals("Weapon")) {
-                Health -= WeaponDamage;
-                HealthBar.SetHealth(Health);
+                RemoveHealth(WeaponDamage);
+            }
 
-                if (Health <= 0.0f) {
-                    var toRemoveList = GameManagerBehavior.AllAnimals.Where(tuple => gameObject == tuple.Item1).ToList();
-                    foreach (var removeMe in toRemoveList) {
-                        GameManagerBehavior.AllAnimals.Remove(removeMe);
-                    }
-
-                    PickUpAbleBehavior.DeParent(gameObject, AnimalType);
-                    Destroy(gameObject);
-                }
+            else if (other.name.Contains("Axe")) {
+                RemoveHealth(AxeDamage);
             }
 
             if (other.name.Contains("Goal")) {
                 _isInBarn = true;
+            }
+        }
+
+        private void RemoveHealth(float weaponDamage) {
+            Health -= weaponDamage;
+            HealthBar.SetHealth(Health);
+
+            if (Health <= 0.0f) {
+                var toRemoveList = GameManagerBehavior.AllAnimals.Where(tuple => gameObject == tuple.Item1).ToList();
+                foreach (var removeMe in toRemoveList) {
+                    GameManagerBehavior.AllAnimals.Remove(removeMe);
+                }
+
+                PickUpAbleBehavior.DeParent(gameObject, AnimalType);
+                Destroy(gameObject);
             }
         }
 
