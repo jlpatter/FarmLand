@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace AnimalBehavior {
+namespace CharacterBehavior.AnimalBehavior {
     public class SoundBehavior : MonoBehaviour {
 
         private AudioSource _audioSource;

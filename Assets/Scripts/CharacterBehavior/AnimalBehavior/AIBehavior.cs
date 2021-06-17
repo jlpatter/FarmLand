@@ -1,10 +1,12 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using GameManagement;
+using ObjectBehavior;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
-namespace AnimalBehavior {
+namespace CharacterBehavior.AnimalBehavior {
     public class AIBehavior : MonoBehaviour {
         public AnimalTypes AnimalType { get; private set; }
         public GameManagerBehavior GameManagerBehavior { get; private set; }

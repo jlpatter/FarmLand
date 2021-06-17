@@ -1,7 +1,9 @@
 using System.Linq;
+using CharacterBehavior.PlayerBehavior;
+using ObjectBehavior;
 using UnityEngine;
 
-namespace AnimalBehavior {
+namespace CharacterBehavior.AnimalBehavior {
     public class CowBehavior : AIBehavior {
 
         private const float TrampleStrength = 1.0f;
@@ -32,7 +34,7 @@ namespace AnimalBehavior {
                 }
             }
 
-            var playerBehavior = other.gameObject.GetComponent<PlayerBehavior>();
+            var playerBehavior = other.gameObject.GetComponent<PlayerBehavior.PlayerBehavior>();
             if (playerBehavior != null && playerBehavior.AnimalType != AnimalType) {
                 playerBehavior.Health -= TrampleStrength;
                 GameObject.Find("HealthBar").GetComponent<PlayerHealthBar>().SetHealth(playerBehavior.Health);

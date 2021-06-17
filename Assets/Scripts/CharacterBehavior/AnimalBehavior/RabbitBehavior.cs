@@ -1,10 +1,10 @@
 using UnityEngine;
 
-namespace AnimalBehavior {
-    public class PigBehavior : AIBehavior {
+namespace CharacterBehavior.AnimalBehavior {
+    public class RabbitBehavior : AIBehavior {
 
-        public GameObject axe;
-
+        public GameObject weapon;
+        
         protected override void FollowEnemy() {
             if (currentEnemy != null) {
                 currentDirection = (currentEnemy.transform.position - transform.position).normalized;
@@ -13,7 +13,7 @@ namespace AnimalBehavior {
                 }
                 else if ((currentEnemy.transform.position - transform.position).magnitude < 1.5f) {
                     currentDirection = Vector3.zero;
-                    axe.SetActive(true);
+                    weapon.SetActive(true);
                 }
             }
             else {
