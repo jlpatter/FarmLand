@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -67,5 +69,17 @@ public class ScoreboardBehavior : MonoBehaviour {
             default:
                 throw new ArgumentOutOfRangeException(nameof(animal), animal, null);
         }
+    }
+
+    public AnimalTypes GetWinner() {
+        var scoreList =
+            new List<Tuple<int, AnimalTypes>> {
+                new Tuple<int, AnimalTypes>(_cowScore, AnimalTypes.Cow),
+                new Tuple<int, AnimalTypes>(_rabbitScore, AnimalTypes.Rabbit),
+                new Tuple<int, AnimalTypes>(_pigScore, AnimalTypes.Pig),
+                new Tuple<int, AnimalTypes>(_chickenScore, AnimalTypes.Chicken)
+            };
+        
+        return scoreList.Max().Item2;
     }
 }
