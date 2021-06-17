@@ -32,11 +32,21 @@ namespace CharacterBehavior.PlayerBehavior {
         private GameObject _currentPickUpAble;
         private PlayerHealthBar _healthBar;
         private Vector2 _movementInput;
+        private InputMaster _controls;
+        private GameObject _pauseCanvas;
 
         private const float TurnSmoothTime = 0.1f;
         private const float Gravity = -9.81f;
         private const float GroundDistance = 0.4f;
         private const float TrampleStrength = 1.0f;
+
+        private void Awake() {
+            _controls = new InputMaster();
+            _controls.Player.Movement.performed += context => GetMovementInput(context.ReadValue<Vector2>());
+            _controls.Player.Swing.performed += _ => SwingWeapon();
+            _controls.Player.PickUp.performed += _ => PickUpAndDropStuff();
+            _controls.Player.Pause.performed += _ => ShowPauseMenu();
+        }
 
         private void Start() {
             Cursor.visible = false;
@@ -82,16 +92,15 @@ namespace CharacterBehavior.PlayerBehavior {
                     throw new ArgumentOutOfRangeException();
             }
 
+            GameManagerBehavior = GameObject.Find("GameManager").GetComponent<GameManagerBehavior>();
             GameManagerBehavior.AllAnimals.Add(new Tuple<GameObject, AnimalTypes>(gameObject, AnimalType));
             Health = GameManagerBehavior.AnimalAttributesDict[AnimalType].Health;
             var healthBar = GameObject.Find("HealthBar").GetComponent<PlayerHealthBar>();
             healthBar.SetMaxHealth(Health);
             healthBar.SetHealth(Health);
             Speed = GameManagerBehavior.AnimalAttributesDict[AnimalType].Speed;
-
-            GameManagerBehavior.Controls.Player.Movement.performed += context => GetMovementInput(context.ReadValue<Vector2>());
-            GameManagerBehavior.Controls.Player.Swing.performed += _ => SwingWeapon();
-            GameManagerBehavior.Controls.Player.PickUp.performed += _ => PickUpAndDropStuff();
+            
+            _pauseCanvas = GameObject.Find("PauseMenuManager").GetComponent<PauseMenuManager>().pauseCanvas;
         }
 
         private void Update() {
@@ -99,16 +108,17 @@ namespace CharacterBehavior.PlayerBehavior {
         }
 
         private void OnEnable() {
-            GameManagerBehavior = GameObject.Find("GameManager").GetComponent<GameManagerBehavior>();
-            GameManagerBehavior.Controls.Player.Movement.Enable();
-            GameManagerBehavior.Controls.Player.Swing.Enable();
-            GameManagerBehavior.Controls.Player.PickUp.Enable();
+            _controls.Player.Movement.Enable();
+            _controls.Player.Swing.Enable();
+            _controls.Player.PickUp.Enable();
+            _controls.Player.Pause.Enable();
         }
 
         private void OnDisable() {
-            GameManagerBehavior.Controls.Player.Movement.Disable();
-            GameManagerBehavior.Controls.Player.Swing.Disable();
-            GameManagerBehavior.Controls.Player.PickUp.Disable();
+            _controls.Player.Movement.Disable();
+            _controls.Player.Swing.Disable();
+            _controls.Player.PickUp.Disable();
+            _controls.Player.Pause.Disable();
         }
 
         private void OnTriggerEnter(Collider other) {
@@ -128,6 +138,17 @@ namespace CharacterBehavior.PlayerBehavior {
         private void OnTriggerStay(Collider other) {
             if (AnimalType == AnimalTypes.Cow) {
                 TrampleEnemies(other);
+            }
+        }
+        
+        private void ShowPauseMenu() {
+            if (_pauseCanvas.activeSelf) {
+                _pauseCanvas.SetActive(false);
+                Cursor.visible = false;
+            }
+            else {
+                _pauseCanvas.SetActive(true);
+                Cursor.visible = true;
             }
         }
 

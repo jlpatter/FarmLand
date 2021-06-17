@@ -9,14 +9,12 @@ namespace GameManagement {
     public class GameManagerBehavior : MonoBehaviour {
         public List<Tuple<GameObject, AnimalTypes>> AllAnimals { get; private set; }
         public Dictionary<AnimalTypes, AnimalAttributes> AnimalAttributesDict { get; private set; }
-        public InputMaster Controls { get; set; }
         public const float SwordDamage = 5.0f;
         public const float AxeDamage = 7.5f;
 
         public TMP_Text timerText;
         public TMP_Text winnerText;
         public ScoreboardBehavior scoreboardBehavior;
-        public GameObject pauseCanvas;
 
         private float _timer;
         private bool _hasDisplayedWinner;
@@ -30,17 +28,6 @@ namespace GameManagement {
             AnimalAttributesDict[AnimalTypes.Cow] = new AnimalAttributes(4.0f, 100.0f);
             AnimalAttributesDict[AnimalTypes.Pig] = new AnimalAttributes(4.5f, 75.0f);
             // TODO: Add Chicken Here!
-
-            Controls = new InputMaster();
-            Controls.Player.Pause.performed += _ => ShowPauseMenu();
-        }
-
-        private void OnEnable() {
-            Controls.Player.Pause.Enable();
-        }
-        
-        private void OnDisable() {
-            Controls.Player.Pause.Disable();
         }
 
         private void Update() {
@@ -50,17 +37,6 @@ namespace GameManagement {
             }
             else {
                 DisplayTime(_timer);
-            }
-        }
-
-        private void ShowPauseMenu() {
-            if (pauseCanvas.activeSelf) {
-                pauseCanvas.SetActive(false);
-                Cursor.visible = false;
-            }
-            else {
-                pauseCanvas.SetActive(true);
-                Cursor.visible = true;
             }
         }
 
