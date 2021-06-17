@@ -23,7 +23,7 @@ namespace CharacterBehavior.PlayerBehavior {
         public GameObject axe;
         public Transform groundCheckTransform;
         public LayerMask groundMask;
-    
+
         private CharacterController _characterController;
         private float _turnSmoothVelocity;
         private Vector3 _velocity;
@@ -31,6 +31,7 @@ namespace CharacterBehavior.PlayerBehavior {
         private bool _hasPickUpAble;
         private GameObject _currentPickUpAble;
         private PlayerHealthBar _healthBar;
+        private Vector2 _movementInput;
 
         private const float TurnSmoothTime = 0.1f;
         private const float Gravity = -9.81f;
@@ -81,19 +82,33 @@ namespace CharacterBehavior.PlayerBehavior {
                     throw new ArgumentOutOfRangeException();
             }
 
-            GameManagerBehavior = GameObject.Find("GameManager").GetComponent<GameManagerBehavior>();
             GameManagerBehavior.AllAnimals.Add(new Tuple<GameObject, AnimalTypes>(gameObject, AnimalType));
             Health = GameManagerBehavior.AnimalAttributesDict[AnimalType].Health;
             var healthBar = GameObject.Find("HealthBar").GetComponent<PlayerHealthBar>();
             healthBar.SetMaxHealth(Health);
             healthBar.SetHealth(Health);
             Speed = GameManagerBehavior.AnimalAttributesDict[AnimalType].Speed;
+
+            GameManagerBehavior.Controls.Player.Movement.performed += context => GetMovementInput(context.ReadValue<Vector2>());
+            GameManagerBehavior.Controls.Player.Swing.performed += _ => SwingWeapon();
+            GameManagerBehavior.Controls.Player.PickUp.performed += _ => PickUpAndDropStuff();
         }
 
         private void Update() {
             MovePlayer();
-            SwingWeapon();
-            PickUpAndDropStuff();
+        }
+
+        private void OnEnable() {
+            GameManagerBehavior = GameObject.Find("GameManager").GetComponent<GameManagerBehavior>();
+            GameManagerBehavior.Controls.Player.Movement.Enable();
+            GameManagerBehavior.Controls.Player.Swing.Enable();
+            GameManagerBehavior.Controls.Player.PickUp.Enable();
+        }
+
+        private void OnDisable() {
+            GameManagerBehavior.Controls.Player.Movement.Disable();
+            GameManagerBehavior.Controls.Player.Swing.Disable();
+            GameManagerBehavior.Controls.Player.PickUp.Disable();
         }
 
         private void OnTriggerEnter(Collider other) {
@@ -137,10 +152,8 @@ namespace CharacterBehavior.PlayerBehavior {
             if (_isGrounded && _velocity.y < 0) {
                 _velocity.y = -2.0f;
             }
-        
-            var horizontal = Input.GetAxisRaw("Horizontal");
-            var vertical = Input.GetAxisRaw("Vertical");
-            var direction = new Vector3(horizontal, 0.0f, vertical).normalized;
+
+            var direction = new Vector3(_movementInput.x, 0.0f, _movementInput.y).normalized;
 
             if (direction.magnitude >= 0.1f) {
 
@@ -156,14 +169,16 @@ namespace CharacterBehavior.PlayerBehavior {
             _characterController.Move(_velocity * Time.deltaTime);
         }
 
+        private void GetMovementInput(Vector2 movement) {
+            _movementInput = movement;
+        }
+
         private void SwingWeapon() {
-            if (Input.GetKeyDown(KeyCode.Space)) {
-                if (AnimalType == AnimalTypes.Rabbit) {
-                    sword.SetActive(true);
-                }
-                else if (AnimalType == AnimalTypes.Pig) {
-                    axe.SetActive(true);
-                }
+            if (AnimalType == AnimalTypes.Rabbit) {
+                sword.SetActive(true);
+            }
+            else if (AnimalType == AnimalTypes.Pig) {
+                axe.SetActive(true);
             }
         }
 
@@ -186,38 +201,36 @@ namespace CharacterBehavior.PlayerBehavior {
         }
 
         private void PickUpAndDropStuff() {
-            if (Input.GetKeyDown(KeyCode.E)) {
-                if (!_hasPickUpAble) {
-                    var allPickUpAbles = GameObject.FindGameObjectsWithTag("PickUpAble");
-                    foreach (var pickUpAble in allPickUpAbles) {
-                        var tempMagnitude = (pickUpAble.transform.position - transform.position).magnitude;
-                        if (tempMagnitude < 2.0f) {
-                            _currentPickUpAble = pickUpAble;
-                            _hasPickUpAble = true;
-                            break;
-                        }
-                    }
-                    if (_hasPickUpAble) {
-                        _currentPickUpAble.transform.position = transform.position + new Vector3(0.0f, _currentPickUpAble.transform.localScale.y, 0.0f);
-                        _currentPickUpAble.transform.parent = transform;
-                        var pickUpAbleBehavior = _currentPickUpAble.GetComponent<PickUpAbleBehavior>();
-                        pickUpAbleBehavior.HasFollowerDictionary[AnimalType] = false;
-                        pickUpAbleBehavior.IsBeingCarried = true;
-                        var tempCurrentPickUpAbleRb = _currentPickUpAble.GetComponent<Rigidbody>();
-                        tempCurrentPickUpAbleRb.useGravity = false;
-                        tempCurrentPickUpAbleRb.isKinematic = true;
+            if (!_hasPickUpAble) {
+                var allPickUpAbles = GameObject.FindGameObjectsWithTag("PickUpAble");
+                foreach (var pickUpAble in allPickUpAbles) {
+                    var tempMagnitude = (pickUpAble.transform.position - transform.position).magnitude;
+                    if (tempMagnitude < 2.0f) {
+                        _currentPickUpAble = pickUpAble;
+                        _hasPickUpAble = true;
+                        break;
                     }
                 }
-                else {
+                if (_hasPickUpAble) {
+                    _currentPickUpAble.transform.position = transform.position + new Vector3(0.0f, _currentPickUpAble.transform.localScale.y, 0.0f);
+                    _currentPickUpAble.transform.parent = transform;
+                    var pickUpAbleBehavior = _currentPickUpAble.GetComponent<PickUpAbleBehavior>();
+                    pickUpAbleBehavior.HasFollowerDictionary[AnimalType] = false;
+                    pickUpAbleBehavior.IsBeingCarried = true;
                     var tempCurrentPickUpAbleRb = _currentPickUpAble.GetComponent<Rigidbody>();
-                    tempCurrentPickUpAbleRb.useGravity = true;
-                    tempCurrentPickUpAbleRb.isKinematic = false;
-                    _currentPickUpAble.GetComponent<PickUpAbleBehavior>().IsBeingCarried = false;
-                    _currentPickUpAble.transform.localPosition += new Vector3(0.0f, 0.0f, _currentPickUpAble.transform.localScale.z);
-                    _currentPickUpAble.transform.parent = null;
-                    _currentPickUpAble = null;
-                    _hasPickUpAble = false;
+                    tempCurrentPickUpAbleRb.useGravity = false;
+                    tempCurrentPickUpAbleRb.isKinematic = true;
                 }
+            }
+            else {
+                var tempCurrentPickUpAbleRb = _currentPickUpAble.GetComponent<Rigidbody>();
+                tempCurrentPickUpAbleRb.useGravity = true;
+                tempCurrentPickUpAbleRb.isKinematic = false;
+                _currentPickUpAble.GetComponent<PickUpAbleBehavior>().IsBeingCarried = false;
+                _currentPickUpAble.transform.localPosition += new Vector3(0.0f, 0.0f, _currentPickUpAble.transform.localScale.z);
+                _currentPickUpAble.transform.parent = null;
+                _currentPickUpAble = null;
+                _hasPickUpAble = false;
             }
         }
     }
