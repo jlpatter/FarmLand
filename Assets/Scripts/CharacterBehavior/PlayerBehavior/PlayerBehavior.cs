@@ -200,7 +200,9 @@ namespace CharacterBehavior.PlayerBehavior {
                     if (_hasPickUpAble) {
                         _currentPickUpAble.transform.position = transform.position + new Vector3(0.0f, _currentPickUpAble.transform.localScale.y, 0.0f);
                         _currentPickUpAble.transform.parent = transform;
-                        _currentPickUpAble.GetComponent<PickUpAbleBehavior>().HasFollowerDictionary[AnimalType] = false;
+                        var pickUpAbleBehavior = _currentPickUpAble.GetComponent<PickUpAbleBehavior>();
+                        pickUpAbleBehavior.HasFollowerDictionary[AnimalType] = false;
+                        pickUpAbleBehavior.IsBeingCarried = true;
                         var tempCurrentPickUpAbleRb = _currentPickUpAble.GetComponent<Rigidbody>();
                         tempCurrentPickUpAbleRb.useGravity = false;
                         tempCurrentPickUpAbleRb.isKinematic = true;
@@ -210,6 +212,7 @@ namespace CharacterBehavior.PlayerBehavior {
                     var tempCurrentPickUpAbleRb = _currentPickUpAble.GetComponent<Rigidbody>();
                     tempCurrentPickUpAbleRb.useGravity = true;
                     tempCurrentPickUpAbleRb.isKinematic = false;
+                    _currentPickUpAble.GetComponent<PickUpAbleBehavior>().IsBeingCarried = false;
                     _currentPickUpAble.transform.localPosition += new Vector3(0.0f, 0.0f, _currentPickUpAble.transform.localScale.z);
                     _currentPickUpAble.transform.parent = null;
                     _currentPickUpAble = null;
