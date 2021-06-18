@@ -7,11 +7,6 @@ namespace GameManagement {
 
         public GameObject mainMenuButton;
 
-        private void Start() {
-            EventSystem.current.SetSelectedGameObject(null);
-            EventSystem.current.SetSelectedGameObject(mainMenuButton);
-        }
-
         private void OnEnable() {
             EventSystem.current.SetSelectedGameObject(null);
             EventSystem.current.SetSelectedGameObject(mainMenuButton);
