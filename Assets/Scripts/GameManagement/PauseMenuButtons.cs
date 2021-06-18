@@ -12,6 +12,11 @@ namespace GameManagement {
             EventSystem.current.SetSelectedGameObject(mainMenuButton);
         }
 
+        private void OnEnable() {
+            EventSystem.current.SetSelectedGameObject(null);
+            EventSystem.current.SetSelectedGameObject(mainMenuButton);
+        }
+
         public void PushExitToMainMenuButton() {
             SceneManager.LoadScene(0);
         }
