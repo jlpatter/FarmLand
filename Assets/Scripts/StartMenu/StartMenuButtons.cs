@@ -1,5 +1,6 @@
 using TMPro;
 using UnityEngine;
+using UnityEngine.Audio;
 using UnityEngine.EventSystems;
 using UnityEngine.SceneManagement;
 
@@ -8,6 +9,7 @@ namespace StartMenu {
         public TMP_Dropdown tmpDropdown;
         public AudioSource musicSource;
         public GameObject playButton;
+        public AudioMixer audioMixer;
 
         private void Start() {
             if (!StartMenuValue.isPlayingMusic) {
@@ -30,6 +32,10 @@ namespace StartMenu {
 
         public void CreditsButtonPush() {
             SceneManager.LoadScene(2);
+        }
+
+        public void SetVolume(float volume) {
+            audioMixer.SetFloat("volume", volume);
         }
     }
 }
