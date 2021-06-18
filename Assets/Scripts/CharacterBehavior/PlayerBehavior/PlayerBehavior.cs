@@ -1,10 +1,12 @@
 using System;
 using System.Linq;
 using CharacterBehavior.AnimalBehavior;
+using Cinemachine;
 using GameManagement;
 using ObjectBehavior;
 using StartMenu;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 namespace CharacterBehavior.PlayerBehavior {
     public class PlayerBehavior : MonoBehaviour {
@@ -21,6 +23,7 @@ namespace CharacterBehavior.PlayerBehavior {
     
         public GameObject sword;
         public GameObject axe;
+        public InputActionReference mouseLook;
         public Transform groundCheckTransform;
         public LayerMask groundMask;
 
@@ -34,6 +37,8 @@ namespace CharacterBehavior.PlayerBehavior {
         private Vector2 _movementInput;
         private InputMaster _controls;
         private GameObject _pauseCanvas;
+        private bool _isPaused;
+        private CinemachineInputProvider _cinemachineInputProvider;
 
         private const float TurnSmoothTime = 0.1f;
         private const float Gravity = -9.81f;
@@ -101,6 +106,8 @@ namespace CharacterBehavior.PlayerBehavior {
             Speed = GameManagerBehavior.AnimalAttributesDict[AnimalType].Speed;
             
             _pauseCanvas = GameObject.Find("PauseMenuManager").GetComponent<PauseMenuManager>().pauseCanvas;
+            _isPaused = false;
+            _cinemachineInputProvider = GameObject.Find("Third Person Camera").GetComponent<CinemachineInputProvider>();
         }
 
         private void Update() {
@@ -145,10 +152,14 @@ namespace CharacterBehavior.PlayerBehavior {
             if (_pauseCanvas.activeSelf) {
                 _pauseCanvas.SetActive(false);
                 Cursor.visible = false;
+                _isPaused = false;
+                _cinemachineInputProvider.XYAxis = mouseLook;
             }
             else {
                 _pauseCanvas.SetActive(true);
                 Cursor.visible = true;
+                _isPaused = true;
+                _cinemachineInputProvider.XYAxis = null;
             }
         }
 
@@ -191,15 +202,22 @@ namespace CharacterBehavior.PlayerBehavior {
         }
 
         private void GetMovementInput(Vector2 movement) {
-            _movementInput = movement;
+            if (!_isPaused) {
+                _movementInput = movement;
+            }
+            else {
+                _movementInput = Vector2.zero;
+            }
         }
 
         private void SwingWeapon() {
-            if (AnimalType == AnimalTypes.Rabbit) {
-                sword.SetActive(true);
-            }
-            else if (AnimalType == AnimalTypes.Pig) {
-                axe.SetActive(true);
+            if (!_isPaused) {
+                if (AnimalType == AnimalTypes.Rabbit) {
+                    sword.SetActive(true);
+                }
+                else if (AnimalType == AnimalTypes.Pig) {
+                    axe.SetActive(true);
+                }
             }
         }
 
@@ -222,36 +240,38 @@ namespace CharacterBehavior.PlayerBehavior {
         }
 
         private void PickUpAndDropStuff() {
-            if (!_hasPickUpAble) {
-                var allPickUpAbles = GameObject.FindGameObjectsWithTag("PickUpAble");
-                foreach (var pickUpAble in allPickUpAbles) {
-                    var tempMagnitude = (pickUpAble.transform.position - transform.position).magnitude;
-                    if (tempMagnitude < 2.0f) {
-                        _currentPickUpAble = pickUpAble;
-                        _hasPickUpAble = true;
-                        break;
+            if (!_isPaused) {
+                if (!_hasPickUpAble) {
+                    var allPickUpAbles = GameObject.FindGameObjectsWithTag("PickUpAble");
+                    foreach (var pickUpAble in allPickUpAbles) {
+                        var tempMagnitude = (pickUpAble.transform.position - transform.position).magnitude;
+                        if (tempMagnitude < 2.0f) {
+                            _currentPickUpAble = pickUpAble;
+                            _hasPickUpAble = true;
+                            break;
+                        }
+                    }
+                    if (_hasPickUpAble) {
+                        _currentPickUpAble.transform.position = transform.position + new Vector3(0.0f, _currentPickUpAble.transform.localScale.y, 0.0f);
+                        _currentPickUpAble.transform.parent = transform;
+                        var pickUpAbleBehavior = _currentPickUpAble.GetComponent<PickUpAbleBehavior>();
+                        pickUpAbleBehavior.HasFollowerDictionary[AnimalType] = false;
+                        pickUpAbleBehavior.IsBeingCarried = true;
+                        var tempCurrentPickUpAbleRb = _currentPickUpAble.GetComponent<Rigidbody>();
+                        tempCurrentPickUpAbleRb.useGravity = false;
+                        tempCurrentPickUpAbleRb.isKinematic = true;
                     }
                 }
-                if (_hasPickUpAble) {
-                    _currentPickUpAble.transform.position = transform.position + new Vector3(0.0f, _currentPickUpAble.transform.localScale.y, 0.0f);
-                    _currentPickUpAble.transform.parent = transform;
-                    var pickUpAbleBehavior = _currentPickUpAble.GetComponent<PickUpAbleBehavior>();
-                    pickUpAbleBehavior.HasFollowerDictionary[AnimalType] = false;
-                    pickUpAbleBehavior.IsBeingCarried = true;
+                else {
                     var tempCurrentPickUpAbleRb = _currentPickUpAble.GetComponent<Rigidbody>();
-                    tempCurrentPickUpAbleRb.useGravity = false;
-                    tempCurrentPickUpAbleRb.isKinematic = true;
+                    tempCurrentPickUpAbleRb.useGravity = true;
+                    tempCurrentPickUpAbleRb.isKinematic = false;
+                    _currentPickUpAble.GetComponent<PickUpAbleBehavior>().IsBeingCarried = false;
+                    _currentPickUpAble.transform.localPosition += new Vector3(0.0f, 0.0f, _currentPickUpAble.transform.localScale.z);
+                    _currentPickUpAble.transform.parent = null;
+                    _currentPickUpAble = null;
+                    _hasPickUpAble = false;
                 }
-            }
-            else {
-                var tempCurrentPickUpAbleRb = _currentPickUpAble.GetComponent<Rigidbody>();
-                tempCurrentPickUpAbleRb.useGravity = true;
-                tempCurrentPickUpAbleRb.isKinematic = false;
-                _currentPickUpAble.GetComponent<PickUpAbleBehavior>().IsBeingCarried = false;
-                _currentPickUpAble.transform.localPosition += new Vector3(0.0f, 0.0f, _currentPickUpAble.transform.localScale.z);
-                _currentPickUpAble.transform.parent = null;
-                _currentPickUpAble = null;
-                _hasPickUpAble = false;
             }
         }
     }
