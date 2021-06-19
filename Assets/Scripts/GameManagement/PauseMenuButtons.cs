@@ -13,8 +13,7 @@ namespace GameManagement {
             StartCoroutine(coroutine);
         }
         
-        private IEnumerator SelectButtonLater()
-        {
+        private IEnumerator SelectButtonLater() {
             yield return null;
             EventSystem.current.SetSelectedGameObject(null);
             EventSystem.current.SetSelectedGameObject(mainMenuButton);

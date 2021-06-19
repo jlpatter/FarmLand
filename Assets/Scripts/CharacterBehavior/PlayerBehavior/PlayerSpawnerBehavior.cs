@@ -21,7 +21,7 @@ namespace CharacterBehavior.PlayerBehavior {
                     transform.position = GameObject.Find(AnimalTypes.Pig + "Spawner").transform.position;
                     break;
                 case 3:
-                    // TODO: Add Chicken!
+                    transform.position = GameObject.Find(AnimalTypes.Chicken + "Spawner").transform.position;
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();

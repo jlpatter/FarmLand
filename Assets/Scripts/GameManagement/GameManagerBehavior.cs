@@ -27,7 +27,7 @@ namespace GameManagement {
             AnimalAttributesDict[AnimalTypes.Rabbit] = new AnimalAttributes(5.0f, 50.0f);
             AnimalAttributesDict[AnimalTypes.Cow] = new AnimalAttributes(4.0f, 100.0f);
             AnimalAttributesDict[AnimalTypes.Pig] = new AnimalAttributes(4.5f, 75.0f);
-            // TODO: Add Chicken Here!
+            AnimalAttributesDict[AnimalTypes.Chicken] = new AnimalAttributes(5.0f, 50.0f);
         }
 
         private void Update() {

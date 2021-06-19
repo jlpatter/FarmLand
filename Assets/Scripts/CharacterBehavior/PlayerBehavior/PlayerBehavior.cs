@@ -19,7 +19,7 @@ namespace CharacterBehavior.PlayerBehavior {
         public GameObject rabbitPrefab;
         public GameObject cowPrefab;
         public GameObject pigPrefab;
-        // TODO: Add chicken prefab.
+        public GameObject chickenPrefab;
     
         public GameObject sword;
         public GameObject axe;
@@ -84,6 +84,7 @@ namespace CharacterBehavior.PlayerBehavior {
                     AnimalType = AnimalTypes.Pig;
                     transform.position = GameObject.Find(AnimalType + "Spawner").transform.position;
                     Instantiate(pigPrefab, transform.position, Quaternion.Euler(-90.0f, 0.0f, 0.0f), transform);
+                    // TODO: Add Box Collider here!!!
                     groundCheckTransform.localPosition = new Vector3(groundCheckTransform.localPosition.x, -0.359f, groundCheckTransform.localPosition.z);
                     _characterController.center = new Vector3(_characterController.center.x, 0.09f, _characterController.center.z);
                     _characterController.radius = 0.17f;
@@ -91,7 +92,12 @@ namespace CharacterBehavior.PlayerBehavior {
                     break;
                 case 3:
                     AnimalType = AnimalTypes.Chicken;
-                    // TODO: Insert prefab here!
+                    transform.position = GameObject.Find(AnimalType + "Spawner").transform.position;
+                    Instantiate(chickenPrefab, transform.position, Quaternion.Euler(-90.0f, 0.0f, 0.0f), transform);
+                    groundCheckTransform.localPosition = new Vector3(groundCheckTransform.localPosition.x, -0.355f, groundCheckTransform.localPosition.z);
+                    _characterController.center = new Vector3(_characterController.center.x, 0.0f, _characterController.center.z);
+                    _characterController.radius = 0.38f;
+                    _characterController.height = 0.0f;
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();
