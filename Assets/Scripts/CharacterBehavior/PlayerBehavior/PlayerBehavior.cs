@@ -70,10 +70,10 @@ namespace CharacterBehavior.PlayerBehavior {
                     transform.position = GameObject.Find(AnimalType + "Spawner").transform.position;
                     Instantiate(cowPrefab, transform.position, Quaternion.Euler(-90.0f, 0.0f, 0.0f), transform);
                 
-                    var boxCollider = gameObject.AddComponent<BoxCollider>();
-                    boxCollider.isTrigger = true;
-                    boxCollider.center = new Vector3(0.03f, -0.63f, 0.0f);
-                    boxCollider.size = new Vector3(0.7f, 1.94f, 1.85f);
+                    var cowBoxCollider = gameObject.AddComponent<BoxCollider>();
+                    cowBoxCollider.isTrigger = true;
+                    cowBoxCollider.center = new Vector3(0.03f, -0.63f, 0.0f);
+                    cowBoxCollider.size = new Vector3(0.7f, 1.94f, 1.85f);
                 
                     groundCheckTransform.localPosition = new Vector3(groundCheckTransform.localPosition.x, -0.635f, groundCheckTransform.localPosition.z);
                     _characterController.center = new Vector3(_characterController.center.x, 0.06f, _characterController.center.z);
@@ -84,7 +84,12 @@ namespace CharacterBehavior.PlayerBehavior {
                     AnimalType = AnimalTypes.Pig;
                     transform.position = GameObject.Find(AnimalType + "Spawner").transform.position;
                     Instantiate(pigPrefab, transform.position, Quaternion.Euler(-90.0f, 0.0f, 0.0f), transform);
-                    // TODO: Add Box Collider here!!!
+
+                    var pigBoxCollider = gameObject.AddComponent<BoxCollider>();
+                    pigBoxCollider.isTrigger = true;
+                    pigBoxCollider.center = new Vector3(0.01f, 0.09f, 0.03f);
+                    pigBoxCollider.size = new Vector3(0.6f, 0.64f, 0.91f);
+                    
                     groundCheckTransform.localPosition = new Vector3(groundCheckTransform.localPosition.x, -0.359f, groundCheckTransform.localPosition.z);
                     _characterController.center = new Vector3(_characterController.center.x, 0.09f, _characterController.center.z);
                     _characterController.radius = 0.17f;
