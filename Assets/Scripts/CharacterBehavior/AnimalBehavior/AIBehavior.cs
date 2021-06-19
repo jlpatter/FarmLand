@@ -314,6 +314,11 @@ namespace CharacterBehavior.AnimalBehavior {
                     tempCurrentPickUpAbleRb.isKinematic = true;
                     _isCarryingPickUpAble = true;
                     _targetPickUpAbleBehavior.IsBeingCarried = true;
+                    foreach (AnimalTypes animal in Enum.GetValues(typeof(AnimalTypes))) {
+                        if (animal != AnimalType) {
+                            _targetPickUpAbleBehavior.HasFollowerDictionary[animal] = false;
+                        }
+                    }
                     if (_isInBarn) {
                         currentState = AIState.IsTravelingToEnemyBarnEntrance;
                     }
