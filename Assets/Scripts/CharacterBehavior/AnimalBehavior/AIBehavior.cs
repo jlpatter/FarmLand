@@ -330,7 +330,7 @@ namespace CharacterBehavior.AnimalBehavior {
                     tempCurrentPickUpAbleRb.isKinematic = false;
                     _targetPickUpAble.transform.localPosition += new Vector3(0.0f, 0.0f, _targetPickUpAble.transform.localScale.z);
                     _targetPickUpAble.transform.parent = null;
-                    _targetPickUpAble.GetComponent<PickUpAbleBehavior>().HasFollowerDictionary[AnimalType] = false;
+                    _targetPickUpAbleBehavior.HasFollowerDictionary[AnimalType] = false;
                     _targetPickUpAbleBehavior.IsBeingCarried = false;
                     _targetPickUpAbleBehavior = null;
                     _targetPickUpAble = null;
