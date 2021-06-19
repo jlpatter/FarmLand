@@ -11,7 +11,7 @@ namespace CharacterBehavior.AnimalBehavior {
                 if ((currentEnemy.transform.position - transform.position).magnitude > EnemySensoryRange) {
                     currentState = AIState.IsGrazing;
                 }
-                else if ((currentEnemy.transform.position - transform.position).magnitude < 1.5f) {
+                else if ((currentEnemy.transform.position - transform.position).magnitude < 1.0f) {
                     currentDirection = Vector3.zero;
                     axe.SetActive(true);
                 }

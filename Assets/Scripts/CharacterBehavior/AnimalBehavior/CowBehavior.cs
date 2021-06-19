@@ -16,6 +16,18 @@ namespace CharacterBehavior.AnimalBehavior {
         private void OnTriggerStay(Collider other) {
             TrampleAIAndPlayer(other);
         }
+        
+        protected override void FollowEnemy() {
+            if (currentEnemy != null) {
+                currentDirection = (currentEnemy.transform.position - transform.position).normalized;
+                if ((currentEnemy.transform.position - transform.position).magnitude > EnemySensoryRange) {
+                    currentState = AIState.IsGrazing;
+                }
+            }
+            else {
+                currentState = AIState.IsGrazing;
+            }
+        }
 
         private void TrampleAIAndPlayer(Collider other) {
             var aiBehavior = other.gameObject.GetComponent<AIBehavior>();
