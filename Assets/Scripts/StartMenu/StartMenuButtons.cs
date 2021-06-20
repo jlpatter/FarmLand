@@ -1,3 +1,5 @@
+using MLAPI;
+using MLAPI.SceneManagement;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Audio;
@@ -8,7 +10,7 @@ namespace StartMenu {
     public class StartMenuButtons : MonoBehaviour {
         public TMP_Dropdown tmpDropdown;
         public AudioSource musicSource;
-        public GameObject playButton;
+        public GameObject hostButton;
         public AudioMixer audioMixer;
 
         private void Start() {
@@ -18,12 +20,21 @@ namespace StartMenu {
             }
             
             EventSystem.current.SetSelectedGameObject(null);
-            EventSystem.current.SetSelectedGameObject(playButton);
+            EventSystem.current.SetSelectedGameObject(hostButton);
         }
 
-        public void PlayButtonPush() {
+        public void HostButtonPush() {
             StartMenuValue.animal = tmpDropdown.value;
-            SceneManager.LoadScene(1);
+            NetworkManager.Singleton.StartHost();
+            gameObject.SetActive(false);
+            StartMenuValue.gameHasStarted = true;
+        }
+
+        public void JoinButtonPush() {
+            StartMenuValue.animal = tmpDropdown.value;
+            NetworkManager.Singleton.StartClient();
+            gameObject.SetActive(false);
+            StartMenuValue.gameHasStarted = true;
         }
 
         public void ExitButtonPush() {

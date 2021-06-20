@@ -3,13 +3,15 @@ using System.Linq;
 using CharacterBehavior.AnimalBehavior;
 using Cinemachine;
 using GameManagement;
+using MLAPI;
 using ObjectBehavior;
 using StartMenu;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using Cursor = UnityEngine.Cursor;
 
 namespace CharacterBehavior.PlayerBehavior {
-    public class PlayerBehavior : MonoBehaviour {
+    public class PlayerBehavior : NetworkBehaviour {
 
         public AnimalTypes AnimalType { get; private set; }
         public GameManagerBehavior GameManagerBehavior { get; private set; }
@@ -38,6 +40,7 @@ namespace CharacterBehavior.PlayerBehavior {
         private InputMaster _controls;
         private GameObject _pauseCanvas;
         private bool _isPaused;
+        private CinemachineFreeLook _cinemachineFreeLook;
         private CinemachineInputProvider _cinemachineInputProvider;
 
         private const float TurnSmoothTime = 0.1f;
@@ -53,7 +56,7 @@ namespace CharacterBehavior.PlayerBehavior {
             _controls.Player.Pause.performed += _ => ShowPauseMenu();
         }
 
-        private void Start() {
+        public override void NetworkStart() {
             Cursor.visible = false;
             _characterController = GetComponent<CharacterController>();
             _hasPickUpAble = false;
@@ -62,12 +65,16 @@ namespace CharacterBehavior.PlayerBehavior {
             switch (StartMenuValue.animal) {
                 case 0:
                     AnimalType = AnimalTypes.Rabbit;
-                    transform.position = GameObject.Find(AnimalType + "Spawner").transform.position;
+                    if (IsLocalPlayer) {
+                        transform.position = GameObject.Find(AnimalType + "Spawner").transform.position;
+                    }
                     Instantiate(rabbitPrefab, transform.position, Quaternion.Euler(-90.0f, 0.0f, 90.0f), transform);
                     break;
                 case 1:
                     AnimalType = AnimalTypes.Cow;
-                    transform.position = GameObject.Find(AnimalType + "Spawner").transform.position;
+                    if (IsLocalPlayer) {
+                        transform.position = GameObject.Find(AnimalType + "Spawner").transform.position;
+                    }
                     Instantiate(cowPrefab, transform.position, Quaternion.Euler(-90.0f, 0.0f, 0.0f), transform);
                 
                     var cowBoxCollider = gameObject.AddComponent<BoxCollider>();
@@ -82,7 +89,9 @@ namespace CharacterBehavior.PlayerBehavior {
                     break;
                 case 2:
                     AnimalType = AnimalTypes.Pig;
-                    transform.position = GameObject.Find(AnimalType + "Spawner").transform.position;
+                    if (IsLocalPlayer) {
+                        transform.position = GameObject.Find(AnimalType + "Spawner").transform.position;
+                    }
                     Instantiate(pigPrefab, transform.position, Quaternion.Euler(-90.0f, 0.0f, 0.0f), transform);
 
                     var pigBoxCollider = gameObject.AddComponent<BoxCollider>();
@@ -97,7 +106,9 @@ namespace CharacterBehavior.PlayerBehavior {
                     break;
                 case 3:
                     AnimalType = AnimalTypes.Chicken;
-                    transform.position = GameObject.Find(AnimalType + "Spawner").transform.position;
+                    if (IsLocalPlayer) {
+                        transform.position = GameObject.Find(AnimalType + "Spawner").transform.position;
+                    }
                     Instantiate(chickenPrefab, transform.position, Quaternion.Euler(-90.0f, 0.0f, 0.0f), transform);
                     groundCheckTransform.localPosition = new Vector3(groundCheckTransform.localPosition.x, -0.355f, groundCheckTransform.localPosition.z);
                     _characterController.center = new Vector3(_characterController.center.x, 0.0f, _characterController.center.z);
@@ -118,11 +129,19 @@ namespace CharacterBehavior.PlayerBehavior {
             
             _pauseCanvas = GameObject.Find("PauseMenuManager").GetComponent<PauseMenuManager>().pauseCanvas;
             _isPaused = false;
+            _cinemachineFreeLook = GameObject.Find("Third Person Camera").GetComponent<CinemachineFreeLook>();
             _cinemachineInputProvider = GameObject.Find("Third Person Camera").GetComponent<CinemachineInputProvider>();
+
+            if (IsLocalPlayer) {
+                _cinemachineFreeLook.Follow = transform;
+                _cinemachineFreeLook.LookAt = transform;
+            }
         }
 
         private void Update() {
-            MovePlayer();
+            if (IsLocalPlayer) {
+                MovePlayer();
+            }
         }
 
         private void OnEnable() {
@@ -143,7 +162,7 @@ namespace CharacterBehavior.PlayerBehavior {
             if (AnimalType == AnimalTypes.Cow) {
                 TrampleEnemies(other);
             }
-        
+            
             if (other.name.Equals("Weapon")) {
                 RemoveHealth(GameManagerBehavior.SwordDamage);
             }
@@ -160,17 +179,19 @@ namespace CharacterBehavior.PlayerBehavior {
         }
         
         private void ShowPauseMenu() {
-            if (_pauseCanvas.activeSelf) {
-                _pauseCanvas.SetActive(false);
-                Cursor.visible = false;
-                _isPaused = false;
-                _cinemachineInputProvider.XYAxis = mouseLook;
-            }
-            else {
-                _pauseCanvas.SetActive(true);
-                Cursor.visible = true;
-                _isPaused = true;
-                _cinemachineInputProvider.XYAxis = null;
+            if (IsLocalPlayer) {
+                if (_pauseCanvas.activeSelf) {
+                    _pauseCanvas.SetActive(false);
+                    Cursor.visible = false;
+                    _isPaused = false;
+                    _cinemachineInputProvider.XYAxis = mouseLook;
+                }
+                else {
+                    _pauseCanvas.SetActive(true);
+                    Cursor.visible = true;
+                    _isPaused = true;
+                    _cinemachineInputProvider.XYAxis = null;
+                }
             }
         }
 
@@ -222,7 +243,7 @@ namespace CharacterBehavior.PlayerBehavior {
         }
 
         private void SwingWeapon() {
-            if (!_isPaused) {
+            if (!_isPaused && IsLocalPlayer) {
                 if (AnimalType == AnimalTypes.Rabbit) {
                     sword.SetActive(true);
                 }
@@ -251,7 +272,7 @@ namespace CharacterBehavior.PlayerBehavior {
         }
 
         private void PickUpAndDropStuff() {
-            if (!_isPaused) {
+            if (!_isPaused && IsLocalPlayer) {
                 if (!_hasPickUpAble) {
                     var allPickUpAbles = GameObject.FindGameObjectsWithTag("PickUpAble");
                     foreach (var pickUpAble in allPickUpAbles) {

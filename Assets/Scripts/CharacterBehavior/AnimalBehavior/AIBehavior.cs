@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using GameManagement;
 using ObjectBehavior;
+using StartMenu;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
@@ -95,59 +96,61 @@ namespace CharacterBehavior.AnimalBehavior {
 
         private void Update() {
 
-            _isGrounded = Physics.CheckSphere(groundCheckTransform.position, GroundDistance, groundMask);
+            if (StartMenuValue.gameHasStarted) {
+                _isGrounded = Physics.CheckSphere(groundCheckTransform.position, GroundDistance, groundMask);
 
-            if (_isGrounded && _velocity.y < 0) {
-                _velocity.y = -2.0f;
+                if (_isGrounded && _velocity.y < 0) {
+                    _velocity.y = -2.0f;
+                }
+
+                switch (currentState) {
+                    case AIState.IsGrazing:
+                        if (_isInBarn) {
+                            currentState = AIState.IsTravelingToBarnEntrance;
+                        }
+                        else {
+                            PickRandomDirection();
+                            FindEnemy();
+                            FindPickUpAble();
+                        }
+                        break;
+                    case AIState.FollowEnemy:
+                        FollowEnemy();
+                        break;
+                    case AIState.IsTravelingToPickUpAble:
+                        FollowPickUpAble();
+                        PickUpAndDropStuff();
+                        break;
+                    case AIState.IsTravelingToEnemyBarnEntrance:
+                        FollowEnemyBarnEntrance();
+                        break;
+                    case AIState.IsTravelingToEnemyBarnInterior:
+                        FollowEnemyBarnInterior();
+                        PickUpAndDropStuff();
+                        break;
+                    case AIState.IsTravelingToBarnEntrance:
+                        FollowBarnEntrance();
+                        break;
+                    case AIState.IsTravelingToBarnInterior:
+                        FollowBarnInterior();
+                        PickUpAndDropStuff();
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException();
+                }
+                if (currentDirection.magnitude >= 0.1f) {
+
+                    var targetAngle = Mathf.Atan2(currentDirection.x, currentDirection.z) * Mathf.Rad2Deg;
+                    var angle = Mathf.SmoothDampAngle(transform.eulerAngles.y, targetAngle, ref _turnSmoothVelocity, TurnSmoothTime);
+                    transform.rotation = Quaternion.Euler(0.0f, angle, 0.0f);
+
+                    var moveDirection = Quaternion.Euler(0.0f, targetAngle, 0.0f) * Vector3.forward;
+                    _characterController.Move(moveDirection.normalized * (_speed * Time.deltaTime));
+                }
+
+                _velocity.y += Gravity * Time.deltaTime;
+                _characterController.Move(_velocity * Time.deltaTime);
             }
-
-            switch (currentState) {
-                case AIState.IsGrazing:
-                    if (_isInBarn) {
-                        currentState = AIState.IsTravelingToBarnEntrance;
-                    }
-                    else {
-                        PickRandomDirection();
-                        FindEnemy();
-                        FindPickUpAble();
-                    }
-                    break;
-                case AIState.FollowEnemy:
-                    FollowEnemy();
-                    break;
-                case AIState.IsTravelingToPickUpAble:
-                    FollowPickUpAble();
-                    PickUpAndDropStuff();
-                    break;
-                case AIState.IsTravelingToEnemyBarnEntrance:
-                    FollowEnemyBarnEntrance();
-                    break;
-                case AIState.IsTravelingToEnemyBarnInterior:
-                    FollowEnemyBarnInterior();
-                    PickUpAndDropStuff();
-                    break;
-                case AIState.IsTravelingToBarnEntrance:
-                    FollowBarnEntrance();
-                    break;
-                case AIState.IsTravelingToBarnInterior:
-                    FollowBarnInterior();
-                    PickUpAndDropStuff();
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException();
-            }
-            if (currentDirection.magnitude >= 0.1f) {
-
-                var targetAngle = Mathf.Atan2(currentDirection.x, currentDirection.z) * Mathf.Rad2Deg;
-                var angle = Mathf.SmoothDampAngle(transform.eulerAngles.y, targetAngle, ref _turnSmoothVelocity, TurnSmoothTime);
-                transform.rotation = Quaternion.Euler(0.0f, angle, 0.0f);
-
-                var moveDirection = Quaternion.Euler(0.0f, targetAngle, 0.0f) * Vector3.forward;
-                _characterController.Move(moveDirection.normalized * (_speed * Time.deltaTime));
-            }
-
-            _velocity.y += Gravity * Time.deltaTime;
-            _characterController.Move(_velocity * Time.deltaTime);
         }
 
         protected virtual void OnTriggerEnter(Collider other) {

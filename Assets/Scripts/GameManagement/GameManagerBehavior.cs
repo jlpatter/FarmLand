@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using CharacterBehavior;
 using CharacterBehavior.AnimalBehavior;
+using StartMenu;
 using TMPro;
 using UnityEngine;
 
@@ -31,12 +32,14 @@ namespace GameManagement {
         }
 
         private void Update() {
-            _timer -= Time.deltaTime;
-            if (_timer < 0.0f) {
-                DisplayWinner();
-            }
-            else {
-                DisplayTime(_timer);
+            if (StartMenuValue.gameHasStarted) {
+                _timer -= Time.deltaTime;
+                if (_timer < 0.0f) {
+                    DisplayWinner();
+                }
+                else {
+                    DisplayTime(_timer);
+                }
             }
         }
 
