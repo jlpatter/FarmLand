@@ -2,13 +2,14 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using GameManagement;
+using MLAPI;
 using ObjectBehavior;
 using StartMenu;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
 namespace CharacterBehavior.AnimalBehavior {
-    public class AIBehavior : MonoBehaviour {
+    public class AIBehavior : NetworkBehaviour {
         public AnimalTypes AnimalType { get; private set; }
         public GameManagerBehavior GameManagerBehavior { get; private set; }
         public AIHealthBar HealthBar { get; private set; }
@@ -65,7 +66,7 @@ namespace CharacterBehavior.AnimalBehavior {
             }
         }
 
-        protected void Start() {
+        public override void NetworkStart() {
             _characterController = GetComponent<CharacterController>();
             _timer = -1.0f;
             _targetPickUpAble = null;
@@ -230,9 +231,11 @@ namespace CharacterBehavior.AnimalBehavior {
 
         private void FindEnemy() {
             foreach (var (animalGameObject, animal) in GameManagerBehavior.AllAnimals) {
-                if ((animalGameObject.transform.position - transform.position).magnitude < EnemySensoryRange && animal != AnimalType) {
-                    currentState = AIState.FollowEnemy;
-                    currentEnemy = animalGameObject;
+                if (animalGameObject != null) {
+                    if ((animalGameObject.transform.position - transform.position).magnitude < EnemySensoryRange && animal != AnimalType) {
+                        currentState = AIState.FollowEnemy;
+                        currentEnemy = animalGameObject;
+                    }
                 }
             }
         }

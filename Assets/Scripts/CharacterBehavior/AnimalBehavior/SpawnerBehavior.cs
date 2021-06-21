@@ -1,19 +1,18 @@
+using MLAPI;
+using StartMenu;
 using UnityEngine;
 
 namespace CharacterBehavior.AnimalBehavior {
-    public class SpawnerBehavior : MonoBehaviour {
+    public class SpawnerBehavior : NetworkBehaviour {
         public GameObject prefabToSpawn;
         public int numToSpawn;
-    
-        private void Start() {
-            for (var i = 0; i < numToSpawn; i++) {
-                Instantiate(prefabToSpawn, transform.position, Quaternion.identity, transform);
-            }
-        }
 
         private void Update() {
-            if (transform.childCount < numToSpawn) {
-                Instantiate(prefabToSpawn, transform.position, Quaternion.identity, transform);
+            if (StartMenuValue.gameHasStarted && IsHost) {
+                if (transform.childCount < numToSpawn) {
+                    var go = Instantiate(prefabToSpawn, transform.position, Quaternion.identity, transform);
+                    go.GetComponent<NetworkObject>().Spawn();
+                }
             }
         }
     }
