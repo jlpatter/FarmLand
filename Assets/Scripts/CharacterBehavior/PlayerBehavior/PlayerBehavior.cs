@@ -37,12 +37,15 @@ namespace CharacterBehavior.PlayerBehavior {
         private Vector2 _movementInput;
         private GameObject _pauseCanvas;
         private bool _isPaused;
-        private CinemachineInputProvider _cinemachineInputProvider;
+        private GameObject _myCamera;
+        private CinemachineFreeLook _myCinemachineFreeLook;
+        private Vector2 _lookVector;
 
         private const float TurnSmoothTime = 0.1f;
         private const float Gravity = -9.81f;
         private const float GroundDistance = 0.4f;
         private const float TrampleStrength = 1.0f;
+        private const float LookSpeed = 1.5f;
 
         private void Start() {
             Cursor.visible = false;
@@ -109,11 +112,20 @@ namespace CharacterBehavior.PlayerBehavior {
             
             _pauseCanvas = GameObject.Find("PauseMenuManager").GetComponent<PauseMenuManager>().pauseCanvas;
             _isPaused = false;
-            _cinemachineInputProvider = GameObject.Find("Third Person Camera").GetComponent<CinemachineInputProvider>();
+            _lookVector = Vector2.zero;
+        }
+
+        public void GetCamera(string s) {
+            _myCamera = GameObject.Find(s);
+        }
+
+        public void GetCinemachineFreeLook(string s) {
+            _myCinemachineFreeLook = GameObject.Find(s).GetComponent<CinemachineFreeLook>();
         }
 
         private void Update() {
             MovePlayer();
+            MoveCamera();
         }
 
         private void OnTriggerEnter(Collider other) {
@@ -136,18 +148,28 @@ namespace CharacterBehavior.PlayerBehavior {
             }
         }
         
+        public void OnLook(InputAction.CallbackContext context) {
+            _lookVector = context.ReadValue<Vector2>().normalized;
+            _lookVector.y = -_lookVector.y;
+            _lookVector.x *= 180f;
+        }
+
+        private void MoveCamera() {
+            //Ajust axis values using look speed and Time.deltaTime so the look doesn't go faster if there is more FPS
+            _myCinemachineFreeLook.m_XAxis.Value += _lookVector.x * LookSpeed * Time.deltaTime;
+            _myCinemachineFreeLook.m_YAxis.Value += _lookVector.y * LookSpeed * Time.deltaTime;
+        }
+        
         public void ShowPauseMenu() {
             if (_pauseCanvas.activeSelf) {
                 _pauseCanvas.SetActive(false);
                 Cursor.visible = false;
                 _isPaused = false;
-                _cinemachineInputProvider.XYAxis = mouseLook;
             }
             else {
                 _pauseCanvas.SetActive(true);
                 Cursor.visible = true;
                 _isPaused = true;
-                _cinemachineInputProvider.XYAxis = null;
             }
         }
 
@@ -177,7 +199,7 @@ namespace CharacterBehavior.PlayerBehavior {
 
             if (direction.magnitude >= 0.1f) {
 
-                var targetAngle = Mathf.Atan2(direction.x, direction.z) * Mathf.Rad2Deg + Camera.main.transform.eulerAngles.y;
+                var targetAngle = Mathf.Atan2(direction.x, direction.z) * Mathf.Rad2Deg + _myCamera.transform.eulerAngles.y;
                 var angle = Mathf.SmoothDampAngle(transform.eulerAngles.y, targetAngle, ref _turnSmoothVelocity, TurnSmoothTime);
                 transform.rotation = Quaternion.Euler(0.0f, angle, 0.0f);
 

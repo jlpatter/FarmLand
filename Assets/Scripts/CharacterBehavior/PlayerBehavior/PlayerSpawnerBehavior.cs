@@ -2,6 +2,7 @@ using System;
 using Cinemachine;
 using StartMenu;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 namespace CharacterBehavior.PlayerBehavior {
     public class PlayerSpawnerBehavior : MonoBehaviour {
@@ -9,6 +10,8 @@ namespace CharacterBehavior.PlayerBehavior {
         public GameObject playerPrefab;
         public CinemachineFreeLook cinemachineFreeLook;
         public CinemachineFreeLook p2CinemachineFreeLook;
+        public CinemachineInputProvider p1InputProvider;
+        public CinemachineInputProvider p2InputProvider;
 
         private void Start() {
             switch (StartMenuValue.animal) {
@@ -34,9 +37,18 @@ namespace CharacterBehavior.PlayerBehavior {
                 var player = Instantiate(playerPrefab, transform.position, Quaternion.identity, transform);
                 cinemachineFreeLook.Follow = player.transform;
                 cinemachineFreeLook.LookAt = player.transform;
+                var playerBehavior = player.GetComponent<PlayerBehavior>();
+                playerBehavior.GetCamera("P1 Cam");
+                playerBehavior.GetCinemachineFreeLook("P1 TPC");
                 var player2 = Instantiate(playerPrefab, transform.position, Quaternion.identity, transform);
                 p2CinemachineFreeLook.Follow = player2.transform;
                 p2CinemachineFreeLook.LookAt = player2.transform;
+                var player2Behavior = player2.GetComponent<PlayerBehavior>();
+                player2Behavior.GetCamera("P2 Cam");
+                player2Behavior.GetCinemachineFreeLook("P2 TPC");
+                
+                p1InputProvider.PlayerIndex = 0;
+                p2InputProvider.PlayerIndex = 1;
             }
         }
     }
