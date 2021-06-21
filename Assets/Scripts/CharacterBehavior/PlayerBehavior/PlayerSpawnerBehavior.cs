@@ -33,6 +33,7 @@ namespace CharacterBehavior.PlayerBehavior {
                 var player = Instantiate(playerPrefab, transform.position, Quaternion.identity, transform);
                 cinemachineFreeLook.Follow = player.transform;
                 cinemachineFreeLook.LookAt = player.transform;
+                Instantiate(playerPrefab, transform.position, Quaternion.identity, transform);
             }
         }
     }

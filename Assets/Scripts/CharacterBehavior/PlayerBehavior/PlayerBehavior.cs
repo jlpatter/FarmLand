@@ -35,7 +35,6 @@ namespace CharacterBehavior.PlayerBehavior {
         private GameObject _currentPickUpAble;
         private PlayerHealthBar _healthBar;
         private Vector2 _movementInput;
-        private InputMaster _controls;
         private GameObject _pauseCanvas;
         private bool _isPaused;
         private CinemachineInputProvider _cinemachineInputProvider;
@@ -44,14 +43,6 @@ namespace CharacterBehavior.PlayerBehavior {
         private const float Gravity = -9.81f;
         private const float GroundDistance = 0.4f;
         private const float TrampleStrength = 1.0f;
-
-        private void Awake() {
-            _controls = new InputMaster();
-            _controls.Player.Movement.performed += context => GetMovementInput(context.ReadValue<Vector2>());
-            _controls.Player.Swing.performed += _ => SwingWeapon();
-            _controls.Player.PickUp.performed += _ => PickUpAndDropStuff();
-            _controls.Player.Pause.performed += _ => ShowPauseMenu();
-        }
 
         private void Start() {
             Cursor.visible = false;
@@ -125,20 +116,6 @@ namespace CharacterBehavior.PlayerBehavior {
             MovePlayer();
         }
 
-        private void OnEnable() {
-            _controls.Player.Movement.Enable();
-            _controls.Player.Swing.Enable();
-            _controls.Player.PickUp.Enable();
-            _controls.Player.Pause.Enable();
-        }
-
-        private void OnDisable() {
-            _controls.Player.Movement.Disable();
-            _controls.Player.Swing.Disable();
-            _controls.Player.PickUp.Disable();
-            _controls.Player.Pause.Disable();
-        }
-
         private void OnTriggerEnter(Collider other) {
             if (AnimalType == AnimalTypes.Cow) {
                 TrampleEnemies(other);
@@ -159,7 +136,7 @@ namespace CharacterBehavior.PlayerBehavior {
             }
         }
         
-        private void ShowPauseMenu() {
+        public void ShowPauseMenu() {
             if (_pauseCanvas.activeSelf) {
                 _pauseCanvas.SetActive(false);
                 Cursor.visible = false;
@@ -212,16 +189,16 @@ namespace CharacterBehavior.PlayerBehavior {
             _characterController.Move(_velocity * Time.deltaTime);
         }
 
-        private void GetMovementInput(Vector2 movement) {
+        public void GetMovementInput(InputAction.CallbackContext context) {
             if (!_isPaused) {
-                _movementInput = movement;
+                _movementInput = context.ReadValue<Vector2>();
             }
             else {
                 _movementInput = Vector2.zero;
             }
         }
 
-        private void SwingWeapon() {
+        public void SwingWeapon() {
             if (!_isPaused) {
                 if (AnimalType == AnimalTypes.Rabbit) {
                     sword.SetActive(true);
@@ -250,7 +227,7 @@ namespace CharacterBehavior.PlayerBehavior {
             }
         }
 
-        private void PickUpAndDropStuff() {
+        public void PickUpAndDropStuff() {
             if (!_isPaused) {
                 if (!_hasPickUpAble) {
                     var allPickUpAbles = GameObject.FindGameObjectsWithTag("PickUpAble");
