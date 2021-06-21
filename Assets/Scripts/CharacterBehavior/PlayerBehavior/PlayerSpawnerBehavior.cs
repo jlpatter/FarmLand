@@ -8,6 +8,7 @@ namespace CharacterBehavior.PlayerBehavior {
 
         public GameObject playerPrefab;
         public CinemachineFreeLook cinemachineFreeLook;
+        public CinemachineFreeLook p2CinemachineFreeLook;
 
         private void Start() {
             switch (StartMenuValue.animal) {
@@ -33,7 +34,9 @@ namespace CharacterBehavior.PlayerBehavior {
                 var player = Instantiate(playerPrefab, transform.position, Quaternion.identity, transform);
                 cinemachineFreeLook.Follow = player.transform;
                 cinemachineFreeLook.LookAt = player.transform;
-                Instantiate(playerPrefab, transform.position, Quaternion.identity, transform);
+                var player2 = Instantiate(playerPrefab, transform.position, Quaternion.identity, transform);
+                p2CinemachineFreeLook.Follow = player2.transform;
+                p2CinemachineFreeLook.LookAt = player2.transform;
             }
         }
     }
