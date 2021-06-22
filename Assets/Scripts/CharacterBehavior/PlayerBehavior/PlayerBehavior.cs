@@ -13,7 +13,8 @@ namespace CharacterBehavior.PlayerBehavior {
 
         public AnimalTypes AnimalType { get; private set; }
         public GameManagerBehavior GameManagerBehavior { get; private set; }
-        public PlayerHealthBar HealthBar { get; set; }
+        public PlayerHealthBar HealthBar { get; private set; }
+        public PlayerNumber playerNumber { get; set; }
         public float Health { get; set; }
         private float Speed { get; set; }
 
@@ -142,6 +143,19 @@ namespace CharacterBehavior.PlayerBehavior {
         private void Update() {
             MovePlayer();
             MoveCamera();
+        }
+
+        private void OnDestroy() {
+            switch (playerNumber) {
+                case PlayerNumber.Player1:
+                    PlayerValue.p1IsAlive = false;
+                    break;
+                case PlayerNumber.Player2:
+                    PlayerValue.p2IsAlive = false;
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
         }
 
         private void OnTriggerEnter(Collider other) {
