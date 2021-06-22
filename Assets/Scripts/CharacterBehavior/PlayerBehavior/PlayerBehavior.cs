@@ -46,7 +46,8 @@ namespace CharacterBehavior.PlayerBehavior {
         private const float Gravity = -9.81f;
         private const float GroundDistance = 0.4f;
         private const float TrampleStrength = 1.0f;
-        private const float LookSpeed = 1.5f;
+        private const float LookSpeedP2 = 1.5f;
+        private const float LookSpeedP1 = 0.25f;
 
         private void Start() {
             Cursor.visible = false;
@@ -179,15 +180,24 @@ namespace CharacterBehavior.PlayerBehavior {
         }
         
         public void OnLook(InputAction.CallbackContext context) {
-            _lookVector = context.ReadValue<Vector2>().normalized;
+            _lookVector = context.ReadValue<Vector2>();
             _lookVector.y = -_lookVector.y;
             _lookVector.x *= 180f;
         }
 
         private void MoveCamera() {
             //Ajust axis values using look speed and Time.deltaTime so the look doesn't go faster if there is more FPS
-            _myCinemachineFreeLook.m_XAxis.Value += _lookVector.x * LookSpeed * Time.deltaTime;
-            _myCinemachineFreeLook.m_YAxis.Value += _lookVector.y * LookSpeed * Time.deltaTime;
+            if (playerNumber == PlayerNumber.Player1) {
+                _myCinemachineFreeLook.m_XAxis.Value += _lookVector.x * LookSpeedP1 * Time.deltaTime;
+                _myCinemachineFreeLook.m_YAxis.Value += _lookVector.y * LookSpeedP1 * Time.deltaTime;
+            }
+            else if (playerNumber == PlayerNumber.Player2) {
+                _myCinemachineFreeLook.m_XAxis.Value += _lookVector.x * LookSpeedP2 * Time.deltaTime;
+                _myCinemachineFreeLook.m_YAxis.Value += _lookVector.y * LookSpeedP2 * Time.deltaTime;
+            }
+            else {
+                throw new ArgumentOutOfRangeException();
+            }
         }
         
         public void ShowPauseMenu() {
