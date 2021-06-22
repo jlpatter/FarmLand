@@ -1,4 +1,3 @@
-using System;
 using Cinemachine;
 using StartMenu;
 using UnityEngine;
@@ -26,6 +25,7 @@ namespace CharacterBehavior.PlayerBehavior {
                 var playerBehavior = player.GetComponent<PlayerBehavior>();
                 playerBehavior.SetCamera("P1 Cam");
                 playerBehavior.SetCinemachineFreeLook("P1 TPC");
+                playerBehavior.SetHealthBar("HealthBarP1");
                 playerBehavior.SetAnimal(StartMenuValue.animalP1);
 
                 if (StartMenuValue.isMultiplayer) {
@@ -35,6 +35,7 @@ namespace CharacterBehavior.PlayerBehavior {
                     var player2Behavior = player2.GetComponent<PlayerBehavior>();
                     player2Behavior.SetCamera("P2 Cam");
                     player2Behavior.SetCinemachineFreeLook("P2 TPC");
+                    player2Behavior.SetHealthBar("HealthBarP2");
                     player2Behavior.SetAnimal(StartMenuValue.animalP2);
                 
                     p1InputProvider.PlayerIndex = 0;
@@ -44,6 +45,7 @@ namespace CharacterBehavior.PlayerBehavior {
                     if (_isFirstSpawn) {
                         Destroy(GameObject.Find("P2 TPC"));
                         Destroy(GameObject.Find("P2 Cam"));
+                        Destroy(GameObject.Find("HealthBarP2"));
 
                         GameObject.Find("P1 Cam").GetComponent<Camera>().rect = new Rect(0, 0, 1, 1);
                         _isFirstSpawn = false;

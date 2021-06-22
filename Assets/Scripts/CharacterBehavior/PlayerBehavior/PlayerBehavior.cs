@@ -13,6 +13,7 @@ namespace CharacterBehavior.PlayerBehavior {
 
         public AnimalTypes AnimalType { get; private set; }
         public GameManagerBehavior GameManagerBehavior { get; private set; }
+        public PlayerHealthBar HealthBar { get; set; }
         public float Health { get; set; }
         private float Speed { get; set; }
 
@@ -20,7 +21,7 @@ namespace CharacterBehavior.PlayerBehavior {
         public GameObject cowPrefab;
         public GameObject pigPrefab;
         public GameObject chickenPrefab;
-    
+
         public GameObject sword;
         public GameObject axe;
         public InputActionReference mouseLook;
@@ -33,7 +34,6 @@ namespace CharacterBehavior.PlayerBehavior {
         private bool _isGrounded;
         private bool _hasPickUpAble;
         private GameObject _currentPickUpAble;
-        private PlayerHealthBar _healthBar;
         private Vector2 _movementInput;
         private GameObject _pauseCanvas;
         private bool _isPaused;
@@ -52,7 +52,6 @@ namespace CharacterBehavior.PlayerBehavior {
             _characterController = GetComponent<CharacterController>();
             _hasPickUpAble = false;
             _currentPickUpAble = null;
-            _healthBar = GameObject.Find("HealthBar").GetComponent<PlayerHealthBar>();
 
             _pauseCanvas = GameObject.Find("PauseMenuManager").GetComponent<PauseMenuManager>().pauseCanvas;
             _isPaused = false;
@@ -63,7 +62,7 @@ namespace CharacterBehavior.PlayerBehavior {
             if (_characterController == null) {
                 _characterController = GetComponent<CharacterController>();
             }
-            
+
             switch (animal) {
                 case 0:
                     AnimalType = AnimalTypes.Rabbit;
@@ -74,14 +73,16 @@ namespace CharacterBehavior.PlayerBehavior {
                     AnimalType = AnimalTypes.Cow;
                     transform.position = GameObject.Find(AnimalType + "Spawner").transform.position;
                     Instantiate(cowPrefab, transform.position, Quaternion.Euler(-90.0f, 0.0f, 0.0f), transform);
-                
+
                     var cowBoxCollider = gameObject.AddComponent<BoxCollider>();
                     cowBoxCollider.isTrigger = true;
                     cowBoxCollider.center = new Vector3(0.03f, -0.63f, 0.0f);
                     cowBoxCollider.size = new Vector3(0.7f, 1.94f, 1.85f);
-                
-                    groundCheckTransform.localPosition = new Vector3(groundCheckTransform.localPosition.x, -0.635f, groundCheckTransform.localPosition.z);
-                    _characterController.center = new Vector3(_characterController.center.x, 0.06f, _characterController.center.z);
+
+                    groundCheckTransform.localPosition = new Vector3(groundCheckTransform.localPosition.x, -0.635f,
+                        groundCheckTransform.localPosition.z);
+                    _characterController.center = new Vector3(_characterController.center.x, 0.06f,
+                        _characterController.center.z);
                     _characterController.radius = 0.32f;
                     _characterController.height = 1.15f;
                     break;
@@ -94,9 +95,11 @@ namespace CharacterBehavior.PlayerBehavior {
                     pigBoxCollider.isTrigger = true;
                     pigBoxCollider.center = new Vector3(0.01f, 0.09f, 0.03f);
                     pigBoxCollider.size = new Vector3(0.6f, 0.64f, 0.91f);
-                    
-                    groundCheckTransform.localPosition = new Vector3(groundCheckTransform.localPosition.x, -0.359f, groundCheckTransform.localPosition.z);
-                    _characterController.center = new Vector3(_characterController.center.x, 0.09f, _characterController.center.z);
+
+                    groundCheckTransform.localPosition = new Vector3(groundCheckTransform.localPosition.x, -0.359f,
+                        groundCheckTransform.localPosition.z);
+                    _characterController.center = new Vector3(_characterController.center.x, 0.09f,
+                        _characterController.center.z);
                     _characterController.radius = 0.17f;
                     _characterController.height = 0.63f;
                     break;
@@ -104,26 +107,32 @@ namespace CharacterBehavior.PlayerBehavior {
                     AnimalType = AnimalTypes.Chicken;
                     transform.position = GameObject.Find(AnimalType + "Spawner").transform.position;
                     Instantiate(chickenPrefab, transform.position, Quaternion.Euler(-90.0f, 0.0f, 0.0f), transform);
-                    groundCheckTransform.localPosition = new Vector3(groundCheckTransform.localPosition.x, -0.355f, groundCheckTransform.localPosition.z);
-                    _characterController.center = new Vector3(_characterController.center.x, 0.0f, _characterController.center.z);
+                    groundCheckTransform.localPosition = new Vector3(groundCheckTransform.localPosition.x, -0.355f,
+                        groundCheckTransform.localPosition.z);
+                    _characterController.center =
+                        new Vector3(_characterController.center.x, 0.0f, _characterController.center.z);
                     _characterController.radius = 0.38f;
                     _characterController.height = 0.0f;
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();
             }
-            
+
             GameManagerBehavior = GameObject.Find("GameManager").GetComponent<GameManagerBehavior>();
             GameManagerBehavior.AllAnimals.Add(new Tuple<GameObject, AnimalTypes>(gameObject, AnimalType));
             Health = GameManagerBehavior.AnimalAttributesDict[AnimalType].Health;
-            var healthBar = GameObject.Find("HealthBar").GetComponent<PlayerHealthBar>();
-            healthBar.SetMaxHealth(Health);
-            healthBar.SetHealth(Health);
+            HealthBar.SetMaxHealth(Health);
+            HealthBar.SetHealth(Health);
             Speed = GameManagerBehavior.AnimalAttributesDict[AnimalType].Speed;
         }
 
         public void SetCamera(string s) {
             _myCamera = GameObject.Find(s);
+        }
+
+        // Call this before SetAnimal!!
+        public void SetHealthBar(string s) {
+            HealthBar = GameObject.Find(s).GetComponent<PlayerHealthBar>();
         }
 
         public void SetCinemachineFreeLook(string s) {
@@ -182,7 +191,7 @@ namespace CharacterBehavior.PlayerBehavior {
 
         private void RemoveHealth(float weaponDamage) {
             Health -= weaponDamage;
-            _healthBar.SetHealth(Health);
+            HealthBar.SetHealth(Health);
 
             if (Health <= 0.0f) {
                 var toRemoveList = GameManagerBehavior.AllAnimals.Where(tuple => gameObject == tuple.Item1).ToList();

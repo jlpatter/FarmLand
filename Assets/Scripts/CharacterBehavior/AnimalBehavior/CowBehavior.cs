@@ -49,7 +49,7 @@ namespace CharacterBehavior.AnimalBehavior {
             var playerBehavior = other.gameObject.GetComponent<PlayerBehavior.PlayerBehavior>();
             if (playerBehavior != null && playerBehavior.AnimalType != AnimalType) {
                 playerBehavior.Health -= TrampleStrength;
-                GameObject.Find("HealthBar").GetComponent<PlayerHealthBar>().SetHealth(playerBehavior.Health);
+                playerBehavior.HealthBar.SetHealth(playerBehavior.Health);
 
                 if (playerBehavior.Health <= 0.0f) {
                     var toRemoveList = playerBehavior.GameManagerBehavior.AllAnimals.Where(myTuple => myTuple.Item1 == other.gameObject).ToList();
