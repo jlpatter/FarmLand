@@ -22,15 +22,14 @@ namespace StartMenu {
         }
 
         public void SinglePlayerButtonPush() {
-            StartMenuValue.animal = tmpDropdown.value;
+            StartMenuValue.animalP1 = tmpDropdown.value;
             StartMenuValue.isMultiplayer = false;
             SceneManager.LoadScene(1);
         }
 
         public void MultiPlayerButtonPush() {
-            StartMenuValue.animal = tmpDropdown.value;
-            StartMenuValue.isMultiplayer = true;
-            SceneManager.LoadScene(1);
+            // Set main canvas to inactive
+            gameObject.SetActive(false);
         }
 
         public void ExitButtonPush() {

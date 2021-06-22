@@ -15,23 +15,6 @@ namespace CharacterBehavior.PlayerBehavior {
         private bool _isFirstSpawn;
 
         private void Start() {
-            switch (StartMenuValue.animal) {
-                case 0:
-                    transform.position = GameObject.Find(AnimalTypes.Rabbit + "Spawner").transform.position;
-                    break;
-                case 1:
-                    transform.position = GameObject.Find(AnimalTypes.Cow + "Spawner").transform.position;
-                    break;
-                case 2:
-                    transform.position = GameObject.Find(AnimalTypes.Pig + "Spawner").transform.position;
-                    break;
-                case 3:
-                    transform.position = GameObject.Find(AnimalTypes.Chicken + "Spawner").transform.position;
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException();
-            }
-
             _isFirstSpawn = true;
         }
 
@@ -41,16 +24,18 @@ namespace CharacterBehavior.PlayerBehavior {
                 cinemachineFreeLook.Follow = player.transform;
                 cinemachineFreeLook.LookAt = player.transform;
                 var playerBehavior = player.GetComponent<PlayerBehavior>();
-                playerBehavior.GetCamera("P1 Cam");
-                playerBehavior.GetCinemachineFreeLook("P1 TPC");
+                playerBehavior.SetCamera("P1 Cam");
+                playerBehavior.SetCinemachineFreeLook("P1 TPC");
+                playerBehavior.SetAnimal(StartMenuValue.animalP1);
 
                 if (StartMenuValue.isMultiplayer) {
                     var player2 = Instantiate(playerPrefab, transform.position, Quaternion.identity, transform);
                     p2CinemachineFreeLook.Follow = player2.transform;
                     p2CinemachineFreeLook.LookAt = player2.transform;
                     var player2Behavior = player2.GetComponent<PlayerBehavior>();
-                    player2Behavior.GetCamera("P2 Cam");
-                    player2Behavior.GetCinemachineFreeLook("P2 TPC");
+                    player2Behavior.SetCamera("P2 Cam");
+                    player2Behavior.SetCinemachineFreeLook("P2 TPC");
+                    player2Behavior.SetAnimal(StartMenuValue.animalP2);
                 
                     p1InputProvider.PlayerIndex = 0;
                     p2InputProvider.PlayerIndex = 1;

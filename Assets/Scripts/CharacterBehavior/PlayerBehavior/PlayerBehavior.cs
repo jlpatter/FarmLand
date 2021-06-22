@@ -53,7 +53,18 @@ namespace CharacterBehavior.PlayerBehavior {
             _hasPickUpAble = false;
             _currentPickUpAble = null;
             _healthBar = GameObject.Find("HealthBar").GetComponent<PlayerHealthBar>();
-            switch (StartMenuValue.animal) {
+
+            _pauseCanvas = GameObject.Find("PauseMenuManager").GetComponent<PauseMenuManager>().pauseCanvas;
+            _isPaused = false;
+            _lookVector = Vector2.zero;
+        }
+
+        public void SetAnimal(int animal) {
+            if (_characterController == null) {
+                _characterController = GetComponent<CharacterController>();
+            }
+            
+            switch (animal) {
                 case 0:
                     AnimalType = AnimalTypes.Rabbit;
                     transform.position = GameObject.Find(AnimalType + "Spawner").transform.position;
@@ -101,7 +112,7 @@ namespace CharacterBehavior.PlayerBehavior {
                 default:
                     throw new ArgumentOutOfRangeException();
             }
-
+            
             GameManagerBehavior = GameObject.Find("GameManager").GetComponent<GameManagerBehavior>();
             GameManagerBehavior.AllAnimals.Add(new Tuple<GameObject, AnimalTypes>(gameObject, AnimalType));
             Health = GameManagerBehavior.AnimalAttributesDict[AnimalType].Health;
@@ -109,17 +120,13 @@ namespace CharacterBehavior.PlayerBehavior {
             healthBar.SetMaxHealth(Health);
             healthBar.SetHealth(Health);
             Speed = GameManagerBehavior.AnimalAttributesDict[AnimalType].Speed;
-            
-            _pauseCanvas = GameObject.Find("PauseMenuManager").GetComponent<PauseMenuManager>().pauseCanvas;
-            _isPaused = false;
-            _lookVector = Vector2.zero;
         }
 
-        public void GetCamera(string s) {
+        public void SetCamera(string s) {
             _myCamera = GameObject.Find(s);
         }
 
-        public void GetCinemachineFreeLook(string s) {
+        public void SetCinemachineFreeLook(string s) {
             _myCinemachineFreeLook = GameObject.Find(s).GetComponent<CinemachineFreeLook>();
         }
 
