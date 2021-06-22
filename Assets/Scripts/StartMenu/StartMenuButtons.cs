@@ -21,8 +21,15 @@ namespace StartMenu {
             EventSystem.current.SetSelectedGameObject(playButton);
         }
 
-        public void PlayButtonPush() {
+        public void SinglePlayerButtonPush() {
             StartMenuValue.animal = tmpDropdown.value;
+            StartMenuValue.isMultiplayer = false;
+            SceneManager.LoadScene(1);
+        }
+
+        public void MultiPlayerButtonPush() {
+            StartMenuValue.animal = tmpDropdown.value;
+            StartMenuValue.isMultiplayer = true;
             SceneManager.LoadScene(1);
         }
 

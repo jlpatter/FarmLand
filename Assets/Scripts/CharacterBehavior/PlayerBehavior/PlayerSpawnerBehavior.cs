@@ -2,7 +2,6 @@ using System;
 using Cinemachine;
 using StartMenu;
 using UnityEngine;
-using UnityEngine.InputSystem;
 
 namespace CharacterBehavior.PlayerBehavior {
     public class PlayerSpawnerBehavior : MonoBehaviour {
@@ -12,6 +11,8 @@ namespace CharacterBehavior.PlayerBehavior {
         public CinemachineFreeLook p2CinemachineFreeLook;
         public CinemachineInputProvider p1InputProvider;
         public CinemachineInputProvider p2InputProvider;
+
+        private bool _isFirstSpawn;
 
         private void Start() {
             switch (StartMenuValue.animal) {
@@ -30,6 +31,8 @@ namespace CharacterBehavior.PlayerBehavior {
                 default:
                     throw new ArgumentOutOfRangeException();
             }
+
+            _isFirstSpawn = true;
         }
 
         private void Update() {
@@ -40,15 +43,27 @@ namespace CharacterBehavior.PlayerBehavior {
                 var playerBehavior = player.GetComponent<PlayerBehavior>();
                 playerBehavior.GetCamera("P1 Cam");
                 playerBehavior.GetCinemachineFreeLook("P1 TPC");
-                var player2 = Instantiate(playerPrefab, transform.position, Quaternion.identity, transform);
-                p2CinemachineFreeLook.Follow = player2.transform;
-                p2CinemachineFreeLook.LookAt = player2.transform;
-                var player2Behavior = player2.GetComponent<PlayerBehavior>();
-                player2Behavior.GetCamera("P2 Cam");
-                player2Behavior.GetCinemachineFreeLook("P2 TPC");
+
+                if (StartMenuValue.isMultiplayer) {
+                    var player2 = Instantiate(playerPrefab, transform.position, Quaternion.identity, transform);
+                    p2CinemachineFreeLook.Follow = player2.transform;
+                    p2CinemachineFreeLook.LookAt = player2.transform;
+                    var player2Behavior = player2.GetComponent<PlayerBehavior>();
+                    player2Behavior.GetCamera("P2 Cam");
+                    player2Behavior.GetCinemachineFreeLook("P2 TPC");
                 
-                p1InputProvider.PlayerIndex = 0;
-                p2InputProvider.PlayerIndex = 1;
+                    p1InputProvider.PlayerIndex = 0;
+                    p2InputProvider.PlayerIndex = 1;
+                }
+                else {
+                    if (_isFirstSpawn) {
+                        Destroy(GameObject.Find("P2 TPC"));
+                        Destroy(GameObject.Find("P2 Cam"));
+
+                        GameObject.Find("P1 Cam").GetComponent<Camera>().rect = new Rect(0, 0, 1, 1);
+                        _isFirstSpawn = false;
+                    }
+                }
             }
         }
     }
